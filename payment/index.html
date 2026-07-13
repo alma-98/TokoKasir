@@ -6,111 +6,341 @@
 <title>Pembayaran TokoKasir</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#132238}
-.wrap{min-height:100vh;display:grid;place-items:center;padding:30px}
-.card{width:100%;max-width:520px;background:#fff;border:1px solid #e2e8f0;border-radius:22px;padding:32px;box-shadow:0 20px 60px rgba(20,40,70,.1)}
-.logo{width:52px;height:52px;background:#0f62fe;color:#fff;border-radius:14px;display:grid;place-items:center;font-weight:bold}
-h1{margin:22px 0 8px}
-.muted{color:#64748b}
-.plan{background:#eef5ff;border-radius:14px;padding:18px;margin:24px 0}
-.row{display:flex;justify-content:space-between;gap:20px;padding:8px 0}
-.total{font-size:22px;color:#0f62fe}
-.bank{border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin:20px 0}
-.account{font-size:25px;font-weight:800;letter-spacing:1px;margin:10px 0}
-button,.btn{width:100%;border:0;border-radius:11px;padding:14px;font-weight:bold;cursor:pointer;text-decoration:none;text-align:center;display:block}
-.copy{background:#eef5ff;color:#0f62fe;margin-top:12px}
-.confirm{background:#0f62fe;color:white;margin-top:12px}
-.back{display:block;text-align:center;margin-top:20px;color:#64748b;text-decoration:none}
-.notice{font-size:12px;line-height:1.6;background:#fff8e7;padding:14px;border-radius:10px;color:#7a5b10}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f4f7fb;
+  color:#172033;
+}
+.wrapper{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:30px;
+}
+.card{
+  width:100%;
+  max-width:620px;
+  background:#fff;
+  border:1px solid #e2e8f0;
+  border-radius:24px;
+  padding:32px;
+  box-shadow:0 20px 60px rgba(20,40,80,.08);
+}
+.logo{
+  display:inline-flex;
+  width:52px;
+  height:52px;
+  border-radius:15px;
+  align-items:center;
+  justify-content:center;
+  background:#0f62fe;
+  color:#fff;
+  font-weight:900;
+}
+h1{margin:20px 0 8px}
+.subtitle{color:#64748b;line-height:1.6}
+.summary{
+  margin:25px 0;
+  padding:20px;
+  border-radius:16px;
+  background:#f8fafc;
+  border:1px solid #e5eaf1;
+}
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  padding:10px 0;
+}
+.total{
+  border-top:1px solid #dde4ec;
+  margin-top:8px;
+  padding-top:18px;
+  font-size:20px;
+}
+.bank{
+  padding:20px;
+  border-radius:16px;
+  background:#eef5ff;
+  margin:20px 0;
+}
+.bank strong{
+  display:block;
+  font-size:22px;
+  margin:8px 0;
+}
+.status{
+  padding:15px;
+  border-radius:12px;
+  margin:20px 0;
+  font-weight:700;
+}
+.pending{
+  background:#fff7df;
+  color:#8a6500;
+}
+.approved{
+  background:#eafbf1;
+  color:#167044;
+}
+.error{
+  background:#fff0f0;
+  color:#b42318;
+}
+.actions{
+  display:grid;
+  gap:10px;
+}
+button,a{
+  font:inherit;
+}
+.btn{
+  display:block;
+  width:100%;
+  border:0;
+  border-radius:11px;
+  padding:14px;
+  font-weight:800;
+  cursor:pointer;
+  text-align:center;
+  text-decoration:none;
+}
+.primary{
+  background:#0f62fe;
+  color:white;
+}
+.secondary{
+  background:#eef2f7;
+  color:#172033;
+}
+small.note{
+  display:block;
+  margin-top:20px;
+  color:#64748b;
+  line-height:1.6;
+}
 </style>
 </head>
+
 <body>
 
-<div class="wrap">
+<div class="wrapper">
 <div class="card">
 
 <div class="logo">TK</div>
 
-<h1>Upgrade TokoKasir</h1>
-<p class="muted">Selesaikan pembayaran untuk mengajukan aktivasi paket.</p>
+<h1>Pembayaran TokoKasir</h1>
 
-<div class="plan">
-<div class="row">
-<span>Paket</span>
-<strong id="planName">PRO</strong>
+<p class="subtitle">
+Selesaikan pembayaran paket Anda. Setelah pembayaran
+diverifikasi oleh admin, paket akan aktif selama 30 hari.
+</p>
+
+<div id="content">
+  <p>Memuat tagihan...</p>
 </div>
-
-<div class="row">
-<span>Masa aktif</span>
-<strong>30 Hari</strong>
-</div>
-
-<div class="row total">
-<span>Total</span>
-<strong id="price">Rp99.000</strong>
-</div>
-</div>
-
-<h3>Transfer Bank</h3>
-
-<div class="bank">
-<strong>Bank Mandiri</strong>
-<div class="account" id="accountNumber">1670003828281</div>
-<div>Atas nama: <strong>Alma</strong></div>
-
-<button class="copy" onclick="copyAccount()">
-Salin Nomor Rekening
-</button>
-</div>
-
-<div class="notice">
-Transfer sesuai nominal paket. Aktivasi paket dilakukan setelah pembayaran berhasil diverifikasi. Jangan mengirim PIN, password, OTP, atau data rahasia perbankan.
-</div>
-
-<a
-id="confirmButton"
-class="btn confirm"
-href="sms:+6285283397198"
->
-Saya Sudah Transfer — Konfirmasi via SMS
-</a>
-
-<a class="back" href="../demo/">
-← Kembali Pilih Paket
-</a>
 
 </div>
 </div>
 
 <script>
-const params = new URLSearchParams(location.search);
-const plan = params.get("plan") || "pro";
+const API = "http://localhost:3000";
 
-const plans = {
-  pro: {
-    name: "PRO",
-    price: "Rp99.000"
-  },
-  business: {
-    name: "BUSINESS",
-    price: "Rp299.000"
+const token =
+  localStorage.getItem("tokokasir_token");
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const paymentId =
+  params.get("payment_id");
+
+const content =
+  document.getElementById("content");
+
+if (!token) {
+  window.location.replace("../account/");
+}
+
+if (!paymentId) {
+  content.innerHTML = `
+    <div class="status error">
+      ID pembayaran tidak ditemukan.
+    </div>
+
+    <a class="btn secondary" href="../account/">
+      Kembali ke Akun
+    </a>
+  `;
+} else {
+  loadPayment();
+}
+
+async function api(path, options = {}) {
+  options.headers = {
+    ...(options.headers || {}),
+    Authorization: "Bearer " + token
+  };
+
+  const response =
+    await fetch(API + path, options);
+
+  const data =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message ||
+      "Terjadi kesalahan."
+    );
   }
-};
 
-const selected = plans[plan] || plans.pro;
+  return data;
+}
 
-document.getElementById("planName").textContent = selected.name;
-document.getElementById("price").textContent = selected.price;
+async function loadPayment() {
+  try {
+    const data =
+      await api("/api/payments/my");
 
-const message =
-`Konfirmasi pembayaran TokoKasir ${selected.name} ${selected.price}. Saya sudah melakukan transfer dan ingin mengajukan aktivasi paket.`;
+    const payment =
+      data.payments.find(
+        item =>
+          String(item.id) ===
+          String(paymentId)
+      );
 
-document.getElementById("confirmButton").href =
-"sms:+6285283397198?body=" + encodeURIComponent(message);
+    if (!payment) {
+      throw new Error(
+        "Tagihan tidak ditemukan."
+      );
+    }
 
-function copyAccount() {
-  navigator.clipboard.writeText("1670003828281");
-  alert("Nomor rekening berhasil disalin.");
+    renderPayment(payment);
+
+  } catch (error) {
+    content.innerHTML = `
+      <div class="status error">
+        ${escapeHtml(error.message)}
+      </div>
+
+      <a class="btn secondary" href="../account/">
+        Kembali ke Akun
+      </a>
+    `;
+  }
+}
+
+function renderPayment(payment) {
+  const planLabel =
+    payment.plan === "business"
+      ? "Business"
+      : "Pro";
+
+  const amount =
+    Number(payment.amount)
+      .toLocaleString("id-ID");
+
+  const isApproved =
+    payment.status === "approved";
+
+  content.innerHTML = `
+    <div class="summary">
+
+      <div class="row">
+        <span>ID Pembayaran</span>
+        <strong>#${payment.id}</strong>
+      </div>
+
+      <div class="row">
+        <span>Paket</span>
+        <strong>${planLabel}</strong>
+      </div>
+
+      <div class="row total">
+        <span>Total</span>
+        <strong>Rp${amount}</strong>
+      </div>
+
+    </div>
+
+    ${
+      isApproved
+      ? `
+        <div class="status approved">
+          ✓ Pembayaran telah diverifikasi.
+          Paket ${planLabel} sudah aktif.
+        </div>
+
+        <div class="actions">
+          <a class="btn primary" href="../app/">
+            Buka TokoKasir
+          </a>
+
+          <a class="btn secondary" href="../account/">
+            Lihat Akun
+          </a>
+        </div>
+      `
+      : `
+        <div class="bank">
+          Transfer sesuai total tagihan ke:
+
+          <strong>Bank Mandiri</strong>
+
+          <div class="row">
+            <span>Nomor Rekening</span>
+            <b>1670003828281</b>
+          </div>
+
+          <div class="row">
+            <span>Nama Rekening</span>
+            <b>Alma</b>
+          </div>
+        </div>
+
+        <div class="status pending">
+          ⏳ Menunggu verifikasi pembayaran
+        </div>
+
+        <div class="actions">
+          <button
+            class="btn primary"
+            onclick="checkStatus()"
+          >
+            Cek Status Pembayaran
+          </button>
+
+          <a
+            class="btn secondary"
+            href="../account/"
+          >
+            Kembali ke Akun
+          </a>
+        </div>
+
+        <small class="note">
+          Setelah melakukan transfer, pembayaran perlu
+          diverifikasi oleh admin sebelum paket aktif.
+        </small>
+      `
+    }
+  `;
+}
+
+async function checkStatus() {
+  await loadPayment();
+}
+
+function escapeHtml(text) {
+  const div =
+    document.createElement("div");
+
+  div.textContent = text;
+
+  return div.innerHTML;
 }
 </script>
 

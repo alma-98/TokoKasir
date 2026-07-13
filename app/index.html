@@ -1,6 +1,66 @@
 <!doctype html>
 <html lang="id">
 <head>
+
+<script id="tokokasir-auth-guard">
+(function () {
+  const API = "http://localhost:3000";
+  const token = localStorage.getItem("tokokasir_token");
+
+  if (!token) {
+    window.location.replace("../account/");
+    return;
+  }
+
+  
+
+  fetch(API + "/api/me", {
+    headers: {
+      "Authorization": "Bearer " + token
+    }
+  })
+  .then(async response => {
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Sesi tidak valid");
+    }
+
+    return data.user;
+  })
+  .then(user => {
+    window.TOKOKASIR_USER = user;
+    window.TOKOKASIR_PLAN = user.plan;
+
+    document.documentElement.dataset.plan = user.plan;
+
+    const url = new URL(window.location.href);
+
+    if (url.searchParams.has("plan")) {
+      url.searchParams.delete("plan");
+
+      history.replaceState(
+        {},
+        "",
+        url.pathname + url.search + url.hash
+      );
+    }
+
+    
+
+    window.dispatchEvent(
+      new CustomEvent("tokokasir:authenticated", {
+        detail: user
+      })
+    );
+  })
+  .catch(() => {
+    localStorage.removeItem("tokokasir_token");
+    window.location.replace("../account/");
+  });
+})();
+</script>
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0f62fe">
@@ -12,25 +72,6 @@
 </head>
 <body>
 <div id="toast"></div>
-
-<section id="loginView" class="login-view">
-  <div class="login-card">
-    <div class="logo"><span>TK</span><b>TokoKasir</b></div>
-    <div class="login-copy">
-      <small>POS PINTAR UNTUK UMKM</small>
-      <h1>Masuk ke dashboard bisnis Anda</h1>
-      <p>Versi demo MVP. Data tersimpan di browser menggunakan localStorage.</p>
-    </div>
-    <form id="loginForm">
-      <label>Nama pengguna</label>
-      <input id="loginName" value="Pemilik Toko" required>
-      <label>PIN Demo</label>
-      <input id="loginPin" type="password" value="1234" required>
-      <button class="btn primary" type="submit">Masuk ke TokoKasir</button>
-    </form>
-    <p class="demo-note">PIN demo: <b>1234</b></p>
-  </div>
-</section>
 
 <div id="appView" class="app-shell hidden">
   <aside class="sidebar" id="sidebar">
@@ -49,10 +90,10 @@ DEMO PRO
       <button class="nav-item" data-page="pos"><i>▦</i> Kasir / POS</button>
       <button class="nav-item" data-page="products"><i>□</i> Produk & Stok</button>
       <button class="nav-item" data-page="transactions"><i>↔</i> Transaksi</button>
-      <button class="nav-item" data-page="customers"><i>♙</i> Pelanggan</button>
-      <button class="nav-item" data-page="reports"><i>▥</i> Laporan</button>
-      <button class="nav-item" data-page="branches"><i>⌂</i> Multi-Cabang</button>
-      <button class="nav-item" data-page="ai"><i>✦</i> AI Insight</button>
+      <button class="nav-item" data-page="customers" data-required-plan="pro"><i>♙</i> Pelanggan</button>
+      <button class="nav-item" data-page="reports" data-required-plan="pro"><i>▥</i> Laporan</button>
+      <button class="nav-item" data-page="branches" data-required-plan="business"><i>⌂</i> Multi-Cabang</button>
+      <button class="nav-item" data-page="ai" data-required-plan="pro"><i>✦</i> AI Insight</button>
       <button class="nav-item" data-page="settings"><i>⚙</i> Pengaturan</button>
     </nav>
     <div class="sidebar-bottom">
@@ -240,5 +281,6 @@ DEMO PRO
 </div>
 
 <script src="js/app.js"></script>
+<script src="js/subscription.js"></script>
 </body>
 </html>

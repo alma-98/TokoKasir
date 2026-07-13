@@ -45,12 +45,63 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-open-page]
 $$('.go-pos').forEach(b=>b.onclick=()=>openPage('pos'));
 $('#menuBtn').onclick=()=>$('#sidebar').classList.toggle('open');
 
-$('#loginForm').onsubmit=e=>{
- e.preventDefault(); if($('#loginPin').value!=='1234')return toast('PIN demo salah. Gunakan 1234.');
- state.settings.ownerName=$('#loginName').value||state.settings.ownerName;save();
- $('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');renderAll();
+/* Authentication sekarang menggunakan backend TokoKasir */
+
+function openAuthenticatedApp(user) {
+  if (!user) return;
+
+  state.settings.ownerName =
+    user.name ||
+    state.settings.ownerName;
+
+  save();
+
+  const loginView = $('#loginView');
+  const appView = $('#appView');
+
+  if (loginView) {
+    loginView.classList.add('hidden');
+  }
+
+  if (appView) {
+    appView.classList.remove('hidden');
+  }
+
+  renderAll();
+}
+
+/* Jika auth guard sudah selesai sebelum app.js dimuat */
+if (window.TOKOKASIR_USER) {
+  openAuthenticatedApp(
+    window.TOKOKASIR_USER
+  );
+}
+
+/* Jika auth guard selesai setelah app.js dimuat */
+window.addEventListener(
+  'tokokasir:authenticated',
+  event => {
+    openAuthenticatedApp(
+      event.detail
+    );
+  }
+);
+
+/* Form PIN demo tidak lagi digunakan */
+if ($('#loginForm')) {
+  $('#loginForm').classList.add('hidden');
+}
+
+/* Logout akun backend */
+$('#logoutBtn').onclick = () => {
+  localStorage.removeItem(
+    'tokokasir_token'
+  );
+
+  window.location.replace(
+    '../account/'
+  );
 };
-$('#logoutBtn').onclick=()=>{$('#appView').classList.add('hidden');$('#loginView').classList.remove('hidden')};
 
 function renderAll(){renderHeader();renderDashboard();renderPOS();renderProducts();renderTransactions();renderCustomers();renderReports();renderBranches();renderAI();renderSettings()}
 function renderHeader(){

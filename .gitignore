@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+
+# Environment / Secrets
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+
+# Dependencies
+node_modules/
+server/node_modules/
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+server/data/*.db
+server/data/*.db-shm
+server/data/*.db-wal
+
+# Uploads
+uploads/
+server/uploads/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin TokoKasir</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+header{background:#172033;color:white;padding:20px 30px;display:flex;justify-content:space-between;align-items:center}
+main{max-width:1200px;margin:auto;padding:35px 20px}
+.card{background:white;border:1px solid #e2e8f0;border-radius:18px;padding:25px;box-shadow:0 15px 40px rgba(20,40,80,.06)}
+.login{max-width:450px;margin:80px auto}
+input{width:100%;padding:13px;border:1px solid #d9e1eb;border-radius:9px;margin:7px 0 15px}
+button{border:0;border-radius:9px;padding:11px 15px;font-weight:bold;cursor:pointer}
+.primary{background:#0f62fe;color:white;width:100%}
+.approve{background:#16834b;color:white}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{text-align:left;padding:13px;border-bottom:1px solid #e8edf3;font-size:14px}
+.badge{padding:6px 10px;border-radius:20px;background:#fff5d9;color:#8a6500;font-size:12px;font-weight:bold}
+.approved{background:#eafbf1;color:#167044}
+.hidden{display:none}
+.message{margin-top:15px;padding:12px;background:#fff0f0;color:#b42318;border-radius:9px}
+@media(max-width:800px){.table-wrap{overflow:auto}}
+</style>
+</head>
+
+<body>
+
+<div id="loginArea" class="login card">
+<h1>Admin TokoKasir</h1>
+<p>Masuk menggunakan akun administrator.</p>
+
+<form id="adminLogin">
+<label>Email</label>
+<input id="email" type="email" required>
+
+<label>Password</label>
+<input id="password" type="password" required>
+
+<button class="primary">
+Masuk Admin
+</button>
+</form>
+
+<div id="loginMessage"></div>
+</div>
+
+
+<div id="adminArea" class="hidden">
+
+<header>
+<strong>TokoKasir Admin</strong>
+<button onclick="logout()">Keluar</button>
+</header>
+
+<main>
+
+<div class="card">
+
+<h2>Verifikasi Pembayaran</h2>
+
+<button type="button" onclick="loadPayments()">
+Refresh Data
+</button>
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Pelanggan</th>
+<th>Email</th>
+<th>Paket</th>
+<th>Nominal</th>
+<th>Status</th>
+<th>Aksi</th>
+</tr>
+</thead>
+
+<tbody id="paymentRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+<script>
+const API = "http://localhost:3000";
+let adminToken =
+  localStorage.getItem("tokokasir_admin_token");
+
+document.getElementById("adminLogin")
+.addEventListener("submit", async e => {
+
+  e.preventDefault();
+
+  try{
+
+    const response = await fetch(
+      API + "/api/auth/login",
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          email:document.getElementById("email").value,
+          password:document.getElementById("password").value
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+      throw new Error(data.message);
+    }
+
+    if(data.user.role !== "admin"){
+      throw new Error("Akun ini bukan administrator.");
+    }
+
+    adminToken = data.token;
+
+    localStorage.setItem(
+      "tokokasir_admin_token",
+      adminToken
+    );
+
+    showAdmin();
+
+  }catch(error){
+
+    document.getElementById("loginMessage").innerHTML =
+      '<div class="message">' +
+      error.message +
+      '</div>';
+
+  }
+
+});
+
+function showAdmin(){
+
+  document.getElementById("loginArea")
+    .classList.add("hidden");
+
+  document.getElementById("adminArea")
+    .classList.remove("hidden");
+
+  loadPayments();
+
+}
+
+async function loadPayments(){
+
+  try {
+
+    const response = await fetch(
+      API + "/api/admin/payments",
+      {
+        cache: "no-store",
+        headers:{
+          Authorization:
+            "Bearer " + adminToken
+        }
+      }
+    );
+
+  if(response.status === 401 || response.status === 403){
+    logout();
+    return;
+  }
+
+  const data = await response.json();
+
+  const rows =
+    document.getElementById("paymentRows");
+
+  rows.innerHTML = "";
+
+  data.payments.forEach(payment => {
+
+    const tr =
+      document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${payment.id}</td>
+
+      <td>${payment.name}</td>
+
+      <td>${payment.email}</td>
+
+      <td>
+        ${payment.plan.toUpperCase()}
+      </td>
+
+      <td>
+        Rp${Number(payment.amount)
+          .toLocaleString("id-ID")}
+      </td>
+
+      <td>
+        <span class="badge ${
+          payment.status === "approved"
+            ? "approved"
+            : ""
+        }">
+          ${payment.status}
+        </span>
+      </td>
+
+      <td>
+        ${
+          payment.status === "pending"
+          ? `
+            <button
+              class="approve"
+              onclick="approvePayment(${payment.id})"
+            >
+              Aktifkan
+            </button>
+
+            <button
+              onclick="rejectPayment(${payment.id})"
+            >
+              Tolak
+            </button>
+          `
+          : "Selesai"
+        }
+      </td>
+    `;
+
+    rows.appendChild(tr);
+
+  });
+
+  } catch (error) {
+    console.error(error);
+    alert(
+      "Gagal refresh data: " +
+      error.message
+    );
+  }
+
+}
+
+async function approvePayment(id){
+
+  if(
+    !confirm(
+      "Aktifkan paket pelanggan ini selama 30 hari?"
+    )
+  ){
+    return;
+  }
+
+  const response = await fetch(
+    API +
+    "/api/admin/payments/" +
+    id +
+    "/approve",
+    {
+      method:"POST",
+      headers:{
+        Authorization:
+          "Bearer " + adminToken
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  alert(data.message);
+
+  loadPayments();
+
+}
+
+
+async function rejectPayment(id){
+
+  if(
+    !confirm(
+      "Tolak pembayaran ini?"
+    )
+  ){
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      API +
+      "/api/admin/payments/" +
+      id +
+      "/reject",
+      {
+        method:"POST",
+        headers:{
+          Authorization:
+            "Bearer " + adminToken
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    alert(data.message);
+
+    await loadPayments();
+
+  } catch (error) {
+
+    alert(
+      "Gagal menolak pembayaran: " +
+      error.message
+    );
+
+  }
+
+}
+
+function logout(){
+
+  localStorage.removeItem(
+    "tokokasir_admin_token"
+  );
+
+  location.reload();
+
+}
+
+if(adminToken){
+  showAdmin();
+}
+</script>
+
+</body>
+</html>
