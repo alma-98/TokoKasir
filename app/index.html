@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f62fe">
+  <title>TokoKasir App — POS UMKM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="toast"></div>
+
+<section id="loginView" class="login-view">
+  <div class="login-card">
+    <div class="logo"><span>TK</span><b>TokoKasir</b></div>
+    <div class="login-copy">
+      <small>POS PINTAR UNTUK UMKM</small>
+      <h1>Masuk ke dashboard bisnis Anda</h1>
+      <p>Versi demo MVP. Data tersimpan di browser menggunakan localStorage.</p>
+    </div>
+    <form id="loginForm">
+      <label>Nama pengguna</label>
+      <input id="loginName" value="Pemilik Toko" required>
+      <label>PIN Demo</label>
+      <input id="loginPin" type="password" value="1234" required>
+      <button class="btn primary" type="submit">Masuk ke TokoKasir</button>
+    </form>
+    <p class="demo-note">PIN demo: <b>1234</b></p>
+  </div>
+</section>
+
+<div id="appView" class="app-shell hidden">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span>TK</span><div><b>TokoKasir</b><small>POS UMKM</small></div></div>
+    <nav id="nav">
+      <button class="nav-item active" data-page="dashboard"><i>⌂</i> Dashboard</button>
+      <button class="nav-item" data-page="pos"><i>▦</i> Kasir / POS</button>
+      <button class="nav-item" data-page="products"><i>□</i> Produk & Stok</button>
+      <button class="nav-item" data-page="transactions"><i>↔</i> Transaksi</button>
+      <button class="nav-item" data-page="customers"><i>♙</i> Pelanggan</button>
+      <button class="nav-item" data-page="reports"><i>▥</i> Laporan</button>
+      <button class="nav-item" data-page="branches"><i>⌂</i> Multi-Cabang</button>
+      <button class="nav-item" data-page="ai"><i>✦</i> AI Insight</button>
+      <button class="nav-item" data-page="settings"><i>⚙</i> Pengaturan</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <a href="../index.html">← Landing Page</a>
+      <button id="logoutBtn">Keluar</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-btn" id="menuBtn">☰</button>
+      <div><h2 id="pageTitle">Dashboard</h2><p id="pageSubtitle">Ringkasan performa bisnis Anda</p></div>
+      <div class="top-actions">
+        <div class="branch-pill">● <span id="activeBranch">Cabang Utama</span></div>
+        <div class="avatar" id="avatar">PT</div>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page active" id="page-dashboard">
+        <div class="welcome">
+          <div><small>SELAMAT DATANG</small><h1 id="welcomeName">Halo, Pemilik Toko 👋</h1><p>Berikut ringkasan bisnis Anda hari ini.</p></div>
+          <button class="btn primary go-pos">+ Transaksi Baru</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon">Rp</div><div><small>Omzet Hari Ini</small><strong id="statRevenue">Rp0</strong><span class="positive">Data transaksi hari ini</span></div></div>
+          <div class="stat-card"><div class="stat-icon">↔</div><div><small>Transaksi</small><strong id="statTransactions">0</strong><span>Hari ini</span></div></div>
+          <div class="stat-card"><div class="stat-icon">□</div><div><small>Total Produk</small><strong id="statProducts">0</strong><span id="lowStockText">0 stok menipis</span></div></div>
+          <div class="stat-card"><div class="stat-icon">♙</div><div><small>Pelanggan</small><strong id="statCustomers">0</strong><span>Database pelanggan</span></div></div>
+        </div>
+        <div class="dashboard-grid">
+          <div class="panel">
+            <div class="panel-head"><div><h3>Penjualan 7 Hari</h3><p>Grafik omzet harian</p></div></div>
+            <div class="bar-chart" id="salesChart"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><h3>Produk Terlaris</h3><p>Berdasarkan jumlah terjual</p></div></div>
+            <div id="topProducts"></div>
+          </div>
+        </div>
+        <div class="panel ai-banner">
+          <div class="ai-symbol">✦</div><div><small>TOKOKASIR AI</small><h3>Insight Bisnis Otomatis</h3><p id="dashboardAiText">Tambahkan transaksi untuk mendapatkan analisis penjualan.</p></div>
+          <button class="btn soft" data-open-page="ai">Lihat AI Insight</button>
+        </div>
+      </section>
+
+      <section class="page" id="page-pos">
+        <div class="pos-layout">
+          <div class="panel product-browser">
+            <div class="toolbar">
+              <input id="productSearch" placeholder="Cari produk...">
+              <select id="categoryFilter"><option value="">Semua Kategori</option></select>
+            </div>
+            <div class="product-grid" id="posProducts"></div>
+          </div>
+          <div class="panel cart-panel">
+            <div class="panel-head"><div><h3>Pesanan</h3><p id="cartCount">0 item</p></div><button class="text-btn danger" id="clearCart">Hapus</button></div>
+            <div id="cartItems" class="cart-items"></div>
+            <div class="customer-select"><label>Pelanggan</label><select id="saleCustomer"><option value="">Pelanggan Umum</option></select></div>
+            <div class="totals">
+              <div><span>Subtotal</span><b id="subtotal">Rp0</b></div>
+              <div><span>Diskon</span><input id="discount" type="number" min="0" value="0"></div>
+              <div class="grand"><span>Total</span><strong id="grandTotal">Rp0</strong></div>
+            </div>
+            <div class="payment-methods">
+              <button class="pay-method active" data-method="Tunai">Tunai</button>
+              <button class="pay-method" data-method="QRIS">QRIS</button>
+              <button class="pay-method" data-method="Transfer">Transfer</button>
+            </div>
+            <button class="btn primary full" id="checkoutBtn">Bayar Sekarang</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-products">
+        <div class="page-actions"><div><h3>Produk & Stok</h3><p>Kelola katalog dan persediaan produk.</p></div><button class="btn primary" id="addProductBtn">+ Tambah Produk</button></div>
+        <div class="panel table-wrap">
+          <table><thead><tr><th>Produk</th><th>Kategori</th><th>Harga</th><th>Stok</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="productTable"></tbody></table>
+        </div>
+      </section>
+
+      <section class="page" id="page-transactions">
+        <div class="page-actions"><div><h3>Riwayat Transaksi</h3><p>Semua transaksi penjualan tersimpan di sini.</p></div><button class="btn outline" id="exportTransactions">Export CSV</button></div>
+        <div class="panel table-wrap">
+          <table><thead><tr><th>ID</th><th>Waktu</th><th>Pelanggan</th><th>Item</th><th>Pembayaran</th><th>Total</th></tr></thead><tbody id="transactionTable"></tbody></table>
+        </div>
+      </section>
+
+      <section class="page" id="page-customers">
+        <div class="page-actions"><div><h3>Database Pelanggan</h3><p>Bangun hubungan dan loyalitas pelanggan.</p></div><button class="btn primary" id="addCustomerBtn">+ Tambah Pelanggan</button></div>
+        <div class="customer-grid" id="customerGrid"></div>
+      </section>
+
+      <section class="page" id="page-reports">
+        <div class="page-actions"><div><h3>Laporan Penjualan</h3><p>Analisis performa berdasarkan data transaksi.</p></div><button class="btn outline" id="exportReport">Download CSV</button></div>
+        <div class="stats-grid report-stats">
+          <div class="stat-card"><div><small>Total Omzet</small><strong id="reportRevenue">Rp0</strong></div></div>
+          <div class="stat-card"><div><small>Total Transaksi</small><strong id="reportTransactions">0</strong></div></div>
+          <div class="stat-card"><div><small>Rata-rata Transaksi</small><strong id="reportAverage">Rp0</strong></div></div>
+          <div class="stat-card"><div><small>Produk Terjual</small><strong id="reportItems">0</strong></div></div>
+        </div>
+        <div class="dashboard-grid">
+          <div class="panel"><div class="panel-head"><div><h3>Metode Pembayaran</h3><p>Distribusi transaksi</p></div></div><div id="paymentReport"></div></div>
+          <div class="panel"><div class="panel-head"><div><h3>Ringkasan Produk</h3><p>Performa produk terjual</p></div></div><div id="productReport"></div></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-branches">
+        <div class="page-actions"><div><h3>Multi-Cabang</h3><p>Kelola lokasi bisnis dalam satu dashboard.</p></div><button class="btn primary" id="addBranchBtn">+ Tambah Cabang</button></div>
+        <div class="branch-grid" id="branchGrid"></div>
+      </section>
+
+      <section class="page" id="page-ai">
+        <div class="ai-hero"><div class="ai-symbol large">✦</div><div><small>TOKOKASIR AI INSIGHT</small><h1>Analisis bisnis berbasis data</h1><p>Insight otomatis dari transaksi, stok, dan perilaku penjualan Anda.</p></div></div>
+        <div class="insight-grid" id="insightGrid"></div>
+        <div class="panel"><div class="panel-head"><div><h3>Rekomendasi Tindakan</h3><p>Prioritas yang dapat Anda lakukan sekarang</p></div></div><div id="recommendations"></div></div>
+      </section>
+
+      <section class="page" id="page-settings">
+        <div class="settings-grid">
+          <div class="panel form-panel">
+            <h3>Profil Bisnis</h3>
+            <label>Nama Bisnis</label><input id="businessName">
+            <label>Nama Pemilik</label><input id="ownerName">
+            <label>Nomor Telepon</label><input id="businessPhone">
+            <label>Email</label><input id="businessEmail">
+            <button class="btn primary" id="saveSettings">Simpan Pengaturan</button>
+          </div>
+          <div class="panel">
+            <h3>Informasi Aplikasi</h3>
+            <div class="info-row"><span>Paket</span><b>Pro Demo</b></div>
+            <div class="info-row"><span>Penyimpanan</span><b>LocalStorage</b></div>
+            <div class="info-row"><span>Versi</span><b>MVP 1.0</b></div>
+            <button class="btn danger-btn full" id="resetDemo">Reset Data Demo</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="modal hidden" id="productModal">
+  <div class="modal-card">
+    <div class="modal-head"><h3 id="productModalTitle">Tambah Produk</h3><button class="close-modal">×</button></div>
+    <form id="productForm">
+      <input type="hidden" id="productId">
+      <label>Nama Produk</label><input id="productName" required>
+      <label>Kategori</label><input id="productCategory" required placeholder="Contoh: Minuman">
+      <div class="form-grid"><div><label>Harga</label><input id="productPrice" type="number" min="0" required></div><div><label>Stok</label><input id="productStock" type="number" min="0" required></div></div>
+      <button class="btn primary full" type="submit">Simpan Produk</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal hidden" id="customerModal">
+  <div class="modal-card">
+    <div class="modal-head"><h3>Tambah Pelanggan</h3><button class="close-modal">×</button></div>
+    <form id="customerForm">
+      <label>Nama Pelanggan</label><input id="customerName" required>
+      <label>Nomor WhatsApp</label><input id="customerPhone" placeholder="08xxxxxxxxxx">
+      <label>Email</label><input id="customerEmail" type="email">
+      <button class="btn primary full" type="submit">Simpan Pelanggan</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal hidden" id="branchModal">
+  <div class="modal-card">
+    <div class="modal-head"><h3>Tambah Cabang</h3><button class="close-modal">×</button></div>
+    <form id="branchForm">
+      <label>Nama Cabang</label><input id="branchName" required>
+      <label>Lokasi</label><input id="branchLocation" required>
+      <button class="btn primary full" type="submit">Simpan Cabang</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal hidden" id="receiptModal">
+  <div class="modal-card receipt">
+    <div class="modal-head"><h3>Transaksi Berhasil</h3><button class="close-modal">×</button></div>
+    <div id="receiptContent"></div>
+    <button class="btn primary full" id="printReceipt">Cetak Struk</button>
+    <button class="btn soft full" id="whatsappReceipt">WhatsApp Receipt</button>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
