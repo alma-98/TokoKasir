@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pilih Demo TokoKasir</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#132238}
+.container{max-width:1100px;margin:auto;padding:70px 20px}
+.header{text-align:center;margin-bottom:50px}
+.logo{width:60px;height:60px;margin:auto;display:flex;align-items:center;justify-content:center;background:#0f62fe;color:#fff;border-radius:16px;font-weight:bold}
+h1{font-size:42px;margin:20px 0 10px}
+.header p{color:#64748b}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:25px}
+.card{background:#fff;padding:30px;border-radius:20px;border:1px solid #e2e8f0;box-shadow:0 15px 40px rgba(0,0,0,.06)}
+.card.pro{border:2px solid #0f62fe}
+.plan{color:#0f62fe;font-weight:bold}
+.price{font-size:30px;font-weight:bold;margin:15px 0}
+.price span{font-size:13px;color:#64748b}
+ul{list-style:none;padding:0;min-height:250px}
+li{padding:8px 0}
+.btn{display:block;padding:14px;text-align:center;text-decoration:none;background:#0f62fe;color:#fff;border-radius:10px;font-weight:bold}
+.business .btn{background:#132238}
+.back{display:block;text-align:center;margin-top:40px;text-decoration:none;color:#64748b}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+<div class="logo">TK</div>
+<h1>Pilih Demo TokoKasir</h1>
+<p>Coba langsung perbedaan fitur Gratis, Pro, dan Business.</p>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<div class="plan">GRATIS</div>
+<div class="price">Rp0 <span>/ bulan</span></div>
+<ul>
+<li>✓ Kasir POS Dasar</li>
+<li>✓ Maksimal 50 Produk</li>
+<li>✓ Stok Dasar</li>
+<li>✓ Laporan Ringkas</li>
+<li>🔒 Database Pelanggan</li>
+<li>🔒 WhatsApp Receipt</li>
+<li>🔒 AI Insight</li>
+<li>🔒 Multi Cabang</li>
+</ul>
+<a class="btn" href="../app/?plan=free">Coba Demo Gratis</a>
+</div>
+
+<div class="card pro">
+<div class="plan">PRO</div>
+<div class="price">Rp99.000 <span>/ bulan</span></div>
+<ul>
+<li>✓ Kasir POS Lengkap</li>
+<li>✓ Produk Unlimited</li>
+<li>✓ Manajemen Stok</li>
+<li>✓ Database Pelanggan</li>
+<li>✓ WhatsApp Receipt</li>
+<li>✓ Laporan Lengkap</li>
+<li>✓ Export CSV</li>
+<li>✓ AI Insight</li>
+</ul>
+<a class="btn" href="../payment/?plan=pro">Coba Demo Pro</a>
+</div>
+
+<div class="card business">
+<div class="plan">BUSINESS</div>
+<div class="price">Rp299.000 <span>/ bulan</span></div>
+<ul>
+<li>✓ Semua Fitur Pro</li>
+<li>✓ Multi Cabang</li>
+<li>✓ Dashboard Pusat</li>
+<li>✓ Perbandingan Cabang</li>
+<li>✓ Manajemen Karyawan</li>
+<li>✓ Role & Permission</li>
+<li>✓ Advanced Report</li>
+<li>✓ AI Business Intelligence</li>
+</ul>
+<a class="btn" href="../payment/?plan=business">Coba Demo Business</a>
+</div>
+
+</div>
+
+<a class="back" href="../">← Kembali ke Website TokoKasir</a>
+
+</div>
+</body>
+</html>

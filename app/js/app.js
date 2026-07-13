@@ -172,3 +172,147 @@ $('#saveSettings').onclick=()=>{state.settings={businessName:$('#businessName').
 $('#resetDemo').onclick=()=>{if(confirm('Reset semua data demo?')){state=structuredClone(seed);save();renderAll();toast('Data demo berhasil direset.')}};
 
 renderAll();
+
+/* =========================================
+   TOKOKASIR PLAN DEMO
+========================================= */
+
+const planParams = new URLSearchParams(window.location.search);
+const currentPlan = planParams.get("plan") || "pro";
+
+const planConfig = {
+  free: {
+    name: "GRATIS",
+    price: "Rp0 / bulan"
+  },
+
+  pro: {
+    name: "PRO",
+    price: "Rp99.000 / bulan"
+  },
+
+  business: {
+    name: "BUSINESS",
+    price: "Rp299.000 / bulan"
+  }
+};
+
+function applyPlanDemo() {
+
+  const plan = planConfig[currentPlan] || planConfig.pro;
+
+  console.log(
+    "TokoKasir Demo:",
+    plan.name,
+    plan.price
+  );
+
+  const title = document.querySelector("#pageTitle");
+
+  if (title) {
+    title.setAttribute(
+      "data-plan",
+      plan.name
+    );
+  }
+
+  /*
+  ==========================================
+  FREE PLAN
+  ==========================================
+  */
+
+  if (currentPlan === "free") {
+
+    const lockedPages = [
+      "customers",
+      "ai",
+      "branches"
+    ];
+
+    document
+      .querySelectorAll(".nav-item")
+      .forEach(item => {
+
+        if (
+          lockedPages.includes(
+            item.dataset.page
+          )
+        ) {
+
+          item.innerHTML += " 🔒";
+
+          item.onclick = function(event) {
+
+            event.preventDefault();
+
+            alert(
+              "Fitur ini tersedia di TokoKasir Pro atau Business."
+            );
+
+          };
+
+        }
+
+      });
+
+  }
+
+  /*
+  ==========================================
+  PRO PLAN
+  ==========================================
+  */
+
+  if (currentPlan === "pro") {
+
+    document
+      .querySelectorAll(
+        '[data-page="branches"]'
+      )
+      .forEach(item => {
+
+        item.innerHTML += " 🔒";
+
+        item.onclick = function(event) {
+
+          event.preventDefault();
+
+          alert(
+            "Multi-Cabang tersedia di TokoKasir Business."
+          );
+
+        };
+
+      });
+
+  }
+
+  /*
+  ==========================================
+  BUSINESS PLAN
+  ==========================================
+  */
+
+  if (currentPlan === "business") {
+
+    document.body.classList.add(
+      "business-plan"
+    );
+
+  }
+
+}
+
+applyPlanDemo();
+
+const planBadge =
+  document.getElementById("planBadge");
+
+if (planBadge) {
+
+  planBadge.textContent =
+    "DEMO " +
+    currentPlan.toUpperCase();
+
+}
