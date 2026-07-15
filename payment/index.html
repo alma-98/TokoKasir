@@ -224,6 +224,7 @@ h1{
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</script>
 <script src="../config/supabase-config.js"></script>
 <script src="../config/supabase-client.js"></script>
 
@@ -256,47 +257,54 @@ if (!paymentId) {
 
 }
 
-async function loadPayment(){
+
+
+window.loadPayment = async function loadPayment() {
+
+  const buttons =
+    document.querySelectorAll(
+      'button[onclick="loadPayment()"]'
+    );
+
+  buttons.forEach(button => {
+    button.disabled = true;
+    button.textContent = "Memeriksa status...";
+  });
 
   try {
 
     const {
-      data: {
-        session
-      },
+      data: { session },
       error: sessionError
-    } =
-      await db.auth.getSession();
+    } = await db.auth.getSession();
 
     if (sessionError) {
       throw sessionError;
     }
 
     if (!session) {
-
-      location.replace(
-        "../account/"
-      );
-
+      location.replace("../account/");
       return;
+    }
+
+    if (!paymentId) {
+      throw new Error(
+        "ID pembayaran tidak ditemukan."
+      );
     }
 
     const {
       data: payment,
       error
-    } =
-      await db
-        .from("payments")
-        .select("*")
-        .eq(
-          "id",
-          paymentId
-        )
-        .eq(
-          "auth_user_id",
-          session.user.id
-        )
-        .maybeSingle();
+    } = await db
+      .from("payments")
+      .select("*")
+      .eq("id", paymentId)
+      .eq(
+        "auth_user_id",
+        session.user.id
+      )
+      .maybeSingle();
 
     if (error) {
       throw error;
@@ -304,25 +312,38 @@ async function loadPayment(){
 
     if (!payment) {
       throw new Error(
-        "Tagihan tidak ditemukan."
+        "Tagihan pembayaran tidak ditemukan."
       );
     }
 
-    renderPayment(
-      payment
-    );
+    renderPayment(payment);
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "TokoKasir payment status error:",
+      error
+    );
 
     showError(
       error.message ||
-      "Gagal memuat pembayaran."
+      "Gagal memeriksa status pembayaran."
     );
 
+  } finally {
+
+    document
+      .querySelectorAll(
+        'button[onclick="loadPayment()"]'
+      )
+      .forEach(button => {
+        button.disabled = false;
+        button.textContent =
+          "Cek Status Pembayaran";
+      });
+
   }
-}
+};
 
 function renderPayment(payment) {
 
