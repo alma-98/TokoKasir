@@ -2,13 +2,29 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+
 <meta
   name="viewport"
   content="width=device-width, initial-scale=1.0"
 >
-<title>Admin Pembayaran — TokoKasir</title>
+
+<title>Admin Dashboard — TokoKasir</title>
 
 <style>
+:root {
+  --sidebar: #0f172a;
+  --sidebar-soft: #1e293b;
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -17,120 +33,486 @@ body {
   margin: 0;
   font-family:
     Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
     Arial,
     sans-serif;
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--bg);
+  color: var(--text);
 }
 
-header {
-  background: #0f172a;
-  color: white;
-  padding: 20px;
-}
+/* =========================
+   LOGIN
+========================= */
 
-.header-inner {
-  max-width: 1100px;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.logo {
-  font-size: 22px;
-  font-weight: 800;
-}
-
-.container {
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 0 20px;
-}
-
-.card {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 18px;
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
   padding: 24px;
-  margin-bottom: 20px;
-  box-shadow:
-    0 10px 30px
-    rgba(15, 23, 42, .06);
+  background:
+    radial-gradient(
+      circle at top right,
+      #dbeafe,
+      transparent 35%
+    ),
+    var(--bg);
 }
 
-h1,
-h2,
-p {
-  margin-top: 0;
+.login-card {
+  width: 100%;
+  max-width: 430px;
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow:
+    0 25px 70px
+    rgba(15, 23, 42, .12);
+}
+
+.login-logo {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: var(--sidebar);
+  color: white;
+  font-weight: 900;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.login-card h1 {
+  margin:
+    0 0 8px;
+}
+
+.login-card p {
+  color: var(--muted);
+  margin:
+    0 0 25px;
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 17px;
 }
 
 label {
   display: block;
-  font-weight: 700;
   margin-bottom: 7px;
+  font-weight: 700;
+  font-size: 14px;
 }
 
-input {
+input,
+select {
   width: 100%;
-  padding: 13px 14px;
+  min-height: 44px;
+  padding:
+    10px 13px;
   border:
-    1px solid #cbd5e1;
+    1px solid var(--border);
   border-radius: 10px;
-  font-size: 15px;
+  background: white;
+  font: inherit;
+  color: var(--text);
+  outline: none;
 }
+
+input:focus,
+select:focus {
+  border-color: var(--primary);
+  box-shadow:
+    0 0 0 3px
+    rgba(37, 99, 235, .10);
+}
+
+/* =========================
+   BUTTON
+========================= */
 
 button,
 .btn {
   border: 0;
-  border-radius: 10px;
-  padding: 12px 16px;
+  border-radius: 9px;
+  padding:
+    10px 14px;
+  font: inherit;
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition:
+    transform .15s,
+    opacity .15s;
 }
 
-.primary {
-  background: #0f172a;
+button:hover,
+.btn:hover {
+  opacity: .9;
+}
+
+button:active,
+.btn:active {
+  transform: scale(.98);
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
   color: white;
 }
 
-.approve {
-  background: #16a34a;
+.btn-dark {
+  background: var(--sidebar);
   color: white;
 }
 
-.reject {
-  background: #dc2626;
+.btn-success {
+  background: var(--success);
   color: white;
 }
 
-.secondary {
-  background: #e2e8f0;
-  color: #0f172a;
+.btn-danger {
+  background: var(--danger);
+  color: white;
 }
 
-.actions {
+.btn-light {
+  background: #f1f5f9;
+  color: var(--text);
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* =========================
+   ADMIN LAYOUT
+========================= */
+
+.admin-app {
+  min-height: 100vh;
+  display: flex;
+}
+
+.sidebar {
+  width: 255px;
+  min-height: 100vh;
+  background: var(--sidebar);
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  padding: 22px 15px;
+  z-index: 50;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding:
+    0 10px 25px;
+  border-bottom:
+    1px solid rgba(255,255,255,.08);
+}
+
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: white;
+  color: var(--sidebar);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+}
+
+.brand-title {
+  font-weight: 800;
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.nav {
+  margin-top: 24px;
+}
+
+.nav-title {
+  padding:
+    0 12px 8px;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.nav-item {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #cbd5e1;
+  padding:
+    12px 13px;
+  margin-bottom: 5px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-weight: 600;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: var(--sidebar-soft);
+  color: white;
+}
+
+.sidebar-bottom {
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  bottom: 20px;
+}
+
+.main {
+  flex: 1;
+  margin-left: 255px;
+  min-width: 0;
+}
+
+.topbar {
+  min-height: 72px;
+  background: white;
+  border-bottom:
+    1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding:
+    14px 28px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.topbar-title {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.admin-info {
+  text-align: right;
+}
+
+.admin-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.admin-email {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.content {
+  padding: 28px;
+  max-width: 1600px;
+  margin: auto;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.stats {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  background: white;
+  border:
+    1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 29px;
+  font-weight: 900;
+  margin-top: 10px;
+}
+
+.panel {
+  background: white;
+  border:
+    1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 20px;
+  border-bottom:
+    1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.panel-title {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.panel-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* =========================
+   TOOLBAR
+========================= */
+
+.toolbar {
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 1fr)
+    190px
+    auto;
+  gap: 12px;
+  border-bottom:
+    1px solid var(--border);
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 950px;
+}
+
+th,
+td {
+  text-align: left;
+  padding:
+    15px 17px;
+  border-bottom:
+    1px solid var(--border);
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+th {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+tr:hover td {
+  background: #fafafa;
+}
+
+.badge {
+  display: inline-flex;
+  padding:
+    6px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge.approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge.pro {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badge.business {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.table-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 6px;
 }
 
-.hidden {
-  display: none !important;
+.table-actions button {
+  padding:
+    7px 9px;
+  font-size: 12px;
 }
+
+.empty {
+  padding: 50px 20px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* =========================
+   MESSAGE
+========================= */
 
 .message {
-  padding: 14px;
-  border-radius: 10px;
-  margin-bottom: 18px;
   display: none;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: 11px;
+  font-weight: 600;
 }
 
 .message.show {
@@ -147,106 +529,176 @@ button,
   color: #991b1b;
 }
 
-.payment {
-  border:
-    1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 18px;
-  margin-bottom: 14px;
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background:
+    rgba(15, 23, 42, .55);
+  z-index: 100;
+  display: none;
+  place-items: center;
+  padding: 20px;
 }
 
-.payment-grid {
+.modal.show {
+  display: grid;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow:
+    0 30px 80px
+    rgba(15, 23, 42, .25);
+}
+
+.modal-header {
+  padding: 20px 22px;
+  border-bottom:
+    1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body {
+  padding: 22px;
+}
+
+.detail-grid {
   display: grid;
   grid-template-columns:
-    repeat(
-      auto-fit,
-      minmax(160px, 1fr)
-    );
-  gap: 16px;
-  margin-bottom: 16px;
+    1fr 1fr;
+  gap: 18px;
 }
 
-.label {
-  color: #64748b;
-  font-size: 13px;
-  margin-bottom: 4px;
+.detail-label {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 5px;
 }
 
-.value {
-  font-weight: 800;
+.detail-value {
+  font-weight: 700;
   word-break: break-word;
 }
 
-.status {
-  display: inline-block;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-weight: 800;
-  font-size: 12px;
+/* =========================
+   MOBILE
+========================= */
+
+.mobile-menu {
+  display: none;
 }
 
-.status.pending {
-  background: #fef3c7;
-  color: #92400e;
+.hidden {
+  display: none !important;
 }
 
-.status.approved {
-  background: #dcfce7;
-  color: #166534;
-}
+@media (max-width: 1100px) {
 
-.status.rejected {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-@media (max-width: 640px) {
-  .header-inner {
-    align-items: flex-start;
-    flex-direction: column;
+  .stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
+
+}
+
+@media (max-width: 800px) {
+
+  .sidebar {
+    transform:
+      translateX(-100%);
+    transition:
+      transform .2s;
+  }
+
+  .sidebar.open {
+    transform:
+      translateX(0);
+  }
+
+  .main {
+    margin-left: 0;
+  }
+
+  .mobile-menu {
+    display:
+      inline-flex;
+  }
+
+  .topbar {
+    padding:
+      12px 16px;
+  }
+
+  .content {
+    padding:
+      18px 14px;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media (max-width: 560px) {
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="header-inner">
-    <div class="logo">
-      TK · Admin TokoKasir
+<!-- LOGIN -->
+
+<section
+  id="loginPage"
+  class="login-page"
+>
+
+  <div class="login-card">
+
+    <div class="login-logo">
+      TK
     </div>
 
-    <a
-      href="/TokoKasir/"
-      class="btn secondary"
-    >
-      ← Website
-    </a>
-  </div>
-</header>
-
-<main class="container">
-
-  <div
-    id="message"
-    class="message"
-  ></div>
-
-  <section
-    id="loginCard"
-    class="card"
-  >
-    <h1>Login Admin</h1>
+    <h1>
+      Admin TokoKasir
+    </h1>
 
     <p>
-      Gunakan akun admin TokoKasir.
+      Masuk menggunakan akun administrator.
     </p>
+
+    <div
+      id="loginMessage"
+      class="message"
+    ></div>
 
     <form id="loginForm">
 
       <div class="form-group">
-        <label>Email</label>
+        <label>
+          Email
+        </label>
 
         <input
           id="email"
@@ -257,7 +709,9 @@ button,
       </div>
 
       <div class="form-group">
-        <label>Password</label>
+        <label>
+          Password
+        </label>
 
         <input
           id="password"
@@ -268,68 +722,385 @@ button,
       </div>
 
       <button
+        id="loginButton"
         type="submit"
-        class="primary"
+        class="btn-dark btn-full"
       >
         Masuk Admin
       </button>
 
     </form>
-  </section>
 
-  <section
-    id="adminPanel"
-    class="hidden"
+  </div>
+
+</section>
+
+
+<!-- ADMIN APP -->
+
+<div
+  id="adminApp"
+  class="admin-app hidden"
+>
+
+  <aside
+    id="sidebar"
+    class="sidebar"
   >
 
-    <div class="card">
+    <div class="brand">
 
-      <h1>
-        Verifikasi Pembayaran
-      </h1>
+      <div class="brand-logo">
+        TK
+      </div>
 
-      <p id="adminEmail"></p>
+      <div>
 
-      <div class="actions">
+        <div class="brand-title">
+          TokoKasir
+        </div>
 
-        <button
-          class="primary"
-          onclick="loadPayments()"
-        >
-          Refresh Pembayaran
-        </button>
-
-        <button
-          class="secondary"
-          onclick="logout()"
-        >
-          Keluar
-        </button>
+        <div class="brand-subtitle">
+          Admin Dashboard
+        </div>
 
       </div>
 
     </div>
 
-    <div class="card">
+    <nav class="nav">
 
-      <h2>
-        Daftar Pembayaran
-      </h2>
-
-      <div id="payments">
-        Memuat pembayaran...
+      <div class="nav-title">
+        MENU UTAMA
       </div>
+
+      <button
+        class="nav-item active"
+        onclick="showPayments()"
+      >
+        ▦ Dashboard
+      </button>
+
+      <button
+        class="nav-item"
+        onclick="showPayments()"
+      >
+        💳 Pembayaran
+      </button>
+
+      <a
+        class="nav-item"
+        href="/TokoKasir/"
+      >
+        ↗ Lihat Website
+      </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+      <button
+        class="nav-item"
+        onclick="logout()"
+      >
+        ⇥ Keluar
+      </button>
 
     </div>
 
-  </section>
+  </aside>
 
-</main>
+
+  <main class="main">
+
+    <header class="topbar">
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          gap:12px;
+        "
+      >
+
+        <button
+          class="btn-light mobile-menu"
+          onclick="toggleSidebar()"
+        >
+          ☰
+        </button>
+
+        <div class="topbar-title">
+          Dashboard Admin
+        </div>
+
+      </div>
+
+      <div class="admin-info">
+
+        <div
+          id="adminName"
+          class="admin-name"
+        >
+          Administrator
+        </div>
+
+        <div
+          id="adminEmail"
+          class="admin-email"
+        ></div>
+
+      </div>
+
+    </header>
+
+
+    <div class="content">
+
+      <div
+        id="message"
+        class="message"
+      ></div>
+
+
+      <!-- STATS -->
+
+      <section class="stats">
+
+        <div class="stat-card">
+
+          <div class="stat-label">
+            Total Pembayaran
+          </div>
+
+          <div
+            id="statTotal"
+            class="stat-value"
+          >
+            0
+          </div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-label">
+            Menunggu Verifikasi
+          </div>
+
+          <div
+            id="statPending"
+            class="stat-value"
+          >
+            0
+          </div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-label">
+            Disetujui
+          </div>
+
+          <div
+            id="statApproved"
+            class="stat-value"
+          >
+            0
+          </div>
+
+        </div>
+
+        <div class="stat-card">
+
+          <div class="stat-label">
+            Ditolak
+          </div>
+
+          <div
+            id="statRejected"
+            class="stat-value"
+          >
+            0
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PAYMENT CRUD -->
+
+      <section class="panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <div class="panel-title">
+              Manajemen Pembayaran
+            </div>
+
+            <div class="panel-subtitle">
+              Kelola dan verifikasi pembayaran pelanggan.
+            </div>
+
+          </div>
+
+          <button
+            class="btn-primary"
+            onclick="loadPayments()"
+          >
+            ↻ Refresh Data
+          </button>
+
+        </div>
+
+
+        <div class="toolbar">
+
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Cari ID, paket, status..."
+            oninput="applyFilters()"
+          >
+
+          <select
+            id="statusFilter"
+            onchange="applyFilters()"
+          >
+
+            <option value="">
+              Semua Status
+            </option>
+
+            <option value="pending">
+              Pending
+            </option>
+
+            <option value="approved">
+              Approved
+            </option>
+
+            <option value="rejected">
+              Rejected
+            </option>
+
+          </select>
+
+          <button
+            class="btn-light"
+            onclick="resetFilters()"
+          >
+            Reset
+          </button>
+
+        </div>
+
+
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  ID
+                </th>
+
+                <th>
+                  Paket
+                </th>
+
+                <th>
+                  Nominal
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Tanggal
+                </th>
+
+                <th>
+                  Aksi
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="paymentTable">
+
+              <tr>
+
+                <td
+                  colspan="6"
+                  class="empty"
+                >
+                  Memuat data...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<!-- DETAIL MODAL -->
+
+<div
+  id="detailModal"
+  class="modal"
+  onclick="modalBackdrop(event)"
+>
+
+  <div class="modal-card">
+
+    <div class="modal-header">
+
+      <strong>
+        Detail Pembayaran
+      </strong>
+
+      <button
+        class="btn-light"
+        onclick="closeModal()"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <div
+      id="modalBody"
+      class="modal-body"
+    ></div>
+
+  </div>
+
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="/TokoKasir/config/supabase-config.js"></script>
-
 <script src="/TokoKasir/config/supabase-client.js"></script>
 
 <script>
@@ -338,6 +1109,41 @@ const db =
 
 const ADMIN_EMAIL =
   "alma.budsteddy88@gmail.com";
+
+let allPayments = [];
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function escapeHtml(value) {
+
+  return String(
+    value ?? ""
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+}
+
 
 function showMessage(
   text,
@@ -349,76 +1155,185 @@ function showMessage(
       "message"
     );
 
-  el.textContent = text;
+  el.textContent =
+    text;
 
   el.className =
-    "message show " + type;
+    "message show " +
+    type;
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+  setTimeout(
+    () => {
+      el.className =
+        "message";
+    },
+    5000
+  );
 }
 
-function hideMessage() {
 
-  document
-    .getElementById("message")
-    .className =
-      "message";
+function showLoginMessage(
+  text,
+  type = "error"
+) {
+
+  const el =
+    document.getElementById(
+      "loginMessage"
+    );
+
+  el.textContent =
+    text;
+
+  el.className =
+    "message show " +
+    type;
 }
+
+
+function formatMoney(
+  value
+) {
+
+  return (
+    "Rp" +
+    Number(
+      value || 0
+    )
+      .toLocaleString(
+        "id-ID"
+      )
+  );
+}
+
+
+function formatDate(
+  value
+) {
+
+  if (!value) {
+    return "-";
+  }
+
+  return new Date(
+    value
+  )
+    .toLocaleString(
+      "id-ID"
+    );
+}
+
+
+/* =========================
+   AUTH
+========================= */
 
 async function checkAdmin() {
 
-  const {
-    data: {
-      session
+  try {
+
+    const {
+      data: {
+        session
+      },
+      error
+    } =
+      await db.auth
+        .getSession();
+
+    if (error) {
+      throw error;
     }
-  } =
-    await db.auth.getSession();
 
-  if (!session) {
+    if (!session) {
 
-    document
-      .getElementById(
-        "loginCard"
-      )
-      .classList
-      .remove("hidden");
+      showLogin();
 
-    document
-      .getElementById(
-        "adminPanel"
-      )
-      .classList
-      .add("hidden");
+      return;
+    }
 
-    return;
-  }
+    const email =
+      session.user.email ||
+      "";
 
-  const email =
-    session.user.email || "";
+    if (
+      email.toLowerCase() !==
+      ADMIN_EMAIL.toLowerCase()
+    ) {
 
-  if (
-    email.toLowerCase() !==
-    ADMIN_EMAIL.toLowerCase()
-  ) {
+      await db.auth.signOut();
 
-    await db.auth.signOut();
+      showLogin();
 
-    showMessage(
-      "Akun ini bukan admin TokoKasir.",
-      "error"
+      showLoginMessage(
+        "Akun ini bukan administrator TokoKasir."
+      );
+
+      return;
+    }
+
+    showAdmin(
+      session.user
     );
 
-    return;
+    await loadPayments();
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+    showLogin();
+
+    showLoginMessage(
+      error.message ||
+      "Gagal memeriksa sesi admin."
+    );
+
   }
+
+}
+
+
+function showLogin() {
 
   document
     .getElementById(
-      "loginCard"
+      "loginPage"
+    )
+    .classList
+    .remove("hidden");
+
+  document
+    .getElementById(
+      "adminApp"
+    )
+    .classList
+    .add("hidden");
+
+}
+
+
+function showAdmin(
+  user
+) {
+
+  document
+    .getElementById(
+      "loginPage"
     )
     .classList
     .add("hidden");
 
   document
     .getElementById(
-      "adminPanel"
+      "adminApp"
     )
     .classList
     .remove("hidden");
@@ -428,10 +1343,10 @@ async function checkAdmin() {
       "adminEmail"
     )
     .textContent =
-      "Admin: " + email;
+      user.email || "";
 
-  await loadPayments();
 }
+
 
 document
   .getElementById(
@@ -443,26 +1358,36 @@ document
 
       event.preventDefault();
 
-      hideMessage();
+      const button =
+        document.getElementById(
+          "loginButton"
+        );
 
-      const email =
-        document
-          .getElementById(
-            "email"
-          )
-          .value
-          .trim();
+      button.disabled =
+        true;
 
-      const password =
-        document
-          .getElementById(
-            "password"
-          )
-          .value;
+      button.textContent =
+        "Memproses...";
 
       try {
 
+        const email =
+          document
+            .getElementById(
+              "email"
+            )
+            .value
+            .trim();
+
+        const password =
+          document
+            .getElementById(
+              "password"
+            )
+            .value;
+
         const {
+          data,
           error
         } =
           await db.auth
@@ -475,29 +1400,64 @@ document
           throw error;
         }
 
+        if (
+          !data.user ||
+          data.user.email
+            .toLowerCase() !==
+          ADMIN_EMAIL
+            .toLowerCase()
+        ) {
+
+          await db.auth
+            .signOut();
+
+          throw new Error(
+            "Akun bukan administrator TokoKasir."
+          );
+        }
+
         await checkAdmin();
 
       } catch (error) {
 
-        showMessage(
-          error.message ||
-          "Login gagal.",
-          "error"
+        console.error(
+          error
         );
 
+        showLoginMessage(
+          error.message ||
+          "Login admin gagal."
+        );
+
+      } finally {
+
+        button.disabled =
+          false;
+
+        button.textContent =
+          "Masuk Admin";
+
       }
+
     }
   );
 
+
+async function logout() {
+
+  await db.auth
+    .signOut();
+
+  location.reload();
+
+}
+
+
+/* =========================
+   READ PAYMENTS
+========================= */
+
 async function loadPayments() {
-
-  const container =
-    document.getElementById(
-      "payments"
-    );
-
-  container.innerHTML =
-    "Memuat pembayaran...";
 
   try {
 
@@ -506,7 +1466,9 @@ async function loadPayments() {
       error
     } =
       await db
-        .from("payments")
+        .from(
+          "payments"
+        )
         .select("*")
         .order(
           "created_at",
@@ -519,174 +1481,518 @@ async function loadPayments() {
       throw error;
     }
 
-    if (
-      !data ||
-      data.length === 0
-    ) {
+    allPayments =
+      data || [];
 
-      container.innerHTML =
-        "<p>Belum ada pembayaran.</p>";
+    updateStats();
 
-      return;
-    }
-
-    container.innerHTML =
-      data
-        .map(
-          payment =>
-            renderPayment(payment)
-        )
-        .join("");
+    applyFilters();
 
   } catch (error) {
 
-    container.innerHTML =
-      "<p>Gagal memuat pembayaran.</p>";
+    console.error(
+      error
+    );
 
     showMessage(
-      error.message,
+      error.message ||
+      "Gagal memuat pembayaran.",
       "error"
     );
 
   }
+
 }
 
-function renderPayment(payment) {
 
-  const amount =
-    Number(
-      payment.amount || 0
-    )
-      .toLocaleString(
-        "id-ID"
-      );
+/* =========================
+   STATS
+========================= */
 
-  const plan =
-    String(
-      payment.plan || "-"
-    )
-      .toUpperCase();
+function updateStats() {
 
-  const status =
-    String(
-      payment.status ||
-      "pending"
+  const total =
+    allPayments.length;
+
+  const pending =
+    allPayments.filter(
+      item =>
+        String(
+          item.status
+        )
+          .toLowerCase() ===
+        "pending"
+    ).length;
+
+  const approved =
+    allPayments.filter(
+      item =>
+        String(
+          item.status
+        )
+          .toLowerCase() ===
+        "approved"
+    ).length;
+
+  const rejected =
+    allPayments.filter(
+      item =>
+        String(
+          item.status
+        )
+          .toLowerCase() ===
+        "rejected"
+    ).length;
+
+  document
+    .getElementById(
+      "statTotal"
     )
+    .textContent =
+      total;
+
+  document
+    .getElementById(
+      "statPending"
+    )
+    .textContent =
+      pending;
+
+  document
+    .getElementById(
+      "statApproved"
+    )
+    .textContent =
+      approved;
+
+  document
+    .getElementById(
+      "statRejected"
+    )
+    .textContent =
+      rejected;
+
+}
+
+
+/* =========================
+   FILTER
+========================= */
+
+function applyFilters() {
+
+  const search =
+    document
+      .getElementById(
+        "searchInput"
+      )
+      .value
+      .trim()
       .toLowerCase();
 
-  const createdAt =
-    payment.created_at
-      ? new Date(
-          payment.created_at
-        )
-          .toLocaleString(
-            "id-ID"
+  const status =
+    document
+      .getElementById(
+        "statusFilter"
+      )
+      .value
+      .toLowerCase();
+
+  const filtered =
+    allPayments.filter(
+      payment => {
+
+        const haystack =
+          [
+            payment.id,
+            payment.plan,
+            payment.status,
+            payment.amount,
+            payment.user_id,
+            payment.auth_user_id
+          ]
+            .join(" ")
+            .toLowerCase();
+
+        const matchSearch =
+          !search ||
+          haystack.includes(
+            search
+          );
+
+        const matchStatus =
+          !status ||
+          String(
+            payment.status
           )
-      : "-";
+            .toLowerCase() ===
+          status;
 
-  let buttons = "";
+        return (
+          matchSearch &&
+          matchStatus
+        );
 
-  if (status === "pending") {
+      }
+    );
 
-    buttons = `
-      <div class="actions">
+  renderPayments(
+    filtered
+  );
 
-        <button
-          class="approve"
-          onclick="approvePayment(${Number(payment.id)})"
+}
+
+
+function resetFilters() {
+
+  document
+    .getElementById(
+      "searchInput"
+    )
+    .value =
+      "";
+
+  document
+    .getElementById(
+      "statusFilter"
+    )
+    .value =
+      "";
+
+  applyFilters();
+
+}
+
+
+/* =========================
+   RENDER CRUD TABLE
+========================= */
+
+function renderPayments(
+  payments
+) {
+
+  const tbody =
+    document.getElementById(
+      "paymentTable"
+    );
+
+  if (
+    !payments ||
+    payments.length === 0
+  ) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td
+          colspan="6"
+          class="empty"
         >
-          ✓ Setujui
-        </button>
-
-        <button
-          class="reject"
-          onclick="rejectPayment(${Number(payment.id)})"
-        >
-          ✕ Tolak
-        </button>
-
-      </div>
+          Tidak ada data pembayaran.
+        </td>
+      </tr>
     `;
+
+    return;
   }
 
-  return `
-    <div class="payment">
+  tbody.innerHTML =
+    payments
+      .map(
+        payment => {
 
-      <div class="payment-grid">
+          const id =
+            Number(
+              payment.id
+            );
+
+          const plan =
+            String(
+              payment.plan ||
+              "-"
+            )
+              .toLowerCase();
+
+          const status =
+            String(
+              payment.status ||
+              "pending"
+            )
+              .toLowerCase();
+
+          let actions = `
+            <button
+              class="btn-light"
+              onclick="viewPayment(${id})"
+            >
+              Lihat
+            </button>
+          `;
+
+          if (
+            status ===
+            "pending"
+          ) {
+
+            actions += `
+              <button
+                class="btn-success"
+                onclick="approvePayment(${id})"
+              >
+                Setujui
+              </button>
+
+              <button
+                class="btn-danger"
+                onclick="rejectPayment(${id})"
+              >
+                Tolak
+              </button>
+            `;
+
+          }
+
+          return `
+            <tr>
+
+              <td>
+                <strong>
+                  #${id}
+                </strong>
+              </td>
+
+              <td>
+                <span
+                  class="badge ${escapeHtml(plan)}"
+                >
+                  ${escapeHtml(
+                    plan.toUpperCase()
+                  )}
+                </span>
+              </td>
+
+              <td>
+                <strong>
+                  ${formatMoney(
+                    payment.amount
+                  )}
+                </strong>
+              </td>
+
+              <td>
+                <span
+                  class="badge ${escapeHtml(status)}"
+                >
+                  ${escapeHtml(
+                    status.toUpperCase()
+                  )}
+                </span>
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  formatDate(
+                    payment.created_at
+                  )
+                )}
+              </td>
+
+              <td>
+
+                <div class="table-actions">
+                  ${actions}
+                </div>
+
+              </td>
+
+            </tr>
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+
+/* =========================
+   DETAIL
+========================= */
+
+function viewPayment(
+  paymentId
+) {
+
+  const payment =
+    allPayments.find(
+      item =>
+        Number(
+          item.id
+        ) ===
+        Number(
+          paymentId
+        )
+    );
+
+  if (!payment) {
+
+    showMessage(
+      "Data pembayaran tidak ditemukan.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const userId =
+    payment.auth_user_id ||
+    payment.user_id ||
+    "-";
+
+  document
+    .getElementById(
+      "modalBody"
+    )
+    .innerHTML = `
+
+      <div class="detail-grid">
 
         <div>
-          <div class="label">
+          <div class="detail-label">
             ID Pembayaran
           </div>
 
-          <div class="value">
-            #${payment.id}
+          <div class="detail-value">
+            #${escapeHtml(payment.id)}
           </div>
         </div>
 
         <div>
-          <div class="label">
+          <div class="detail-label">
             Paket
           </div>
 
-          <div class="value">
-            ${plan}
+          <div class="detail-value">
+            ${escapeHtml(
+              String(
+                payment.plan ||
+                "-"
+              )
+                .toUpperCase()
+            )}
           </div>
         </div>
 
         <div>
-          <div class="label">
-            Total
+          <div class="detail-label">
+            Nominal
           </div>
 
-          <div class="value">
-            Rp${amount}
+          <div class="detail-value">
+            ${formatMoney(
+              payment.amount
+            )}
           </div>
         </div>
 
         <div>
-          <div class="label">
+          <div class="detail-label">
             Status
           </div>
 
-          <div>
-            <span
-              class="status ${status}"
-            >
-              ${status.toUpperCase()}
-            </span>
+          <div class="detail-value">
+            ${escapeHtml(
+              String(
+                payment.status ||
+                "-"
+              )
+                .toUpperCase()
+            )}
           </div>
         </div>
 
         <div>
-          <div class="label">
+          <div class="detail-label">
+            User ID
+          </div>
+
+          <div class="detail-value">
+            ${escapeHtml(
+              userId
+            )}
+          </div>
+        </div>
+
+        <div>
+          <div class="detail-label">
             Dibuat
           </div>
 
-          <div class="value">
-            ${createdAt}
+          <div class="detail-value">
+            ${escapeHtml(
+              formatDate(
+                payment.created_at
+              )
+            )}
           </div>
         </div>
 
       </div>
+    `;
 
-      ${buttons}
+  document
+    .getElementById(
+      "detailModal"
+    )
+    .classList
+    .add("show");
 
-    </div>
-  `;
 }
+
+
+function closeModal() {
+
+  document
+    .getElementById(
+      "detailModal"
+    )
+    .classList
+    .remove("show");
+
+}
+
+
+function modalBackdrop(
+  event
+) {
+
+  if (
+    event.target.id ===
+    "detailModal"
+  ) {
+    closeModal();
+  }
+
+}
+
+
+/* =========================
+   UPDATE / APPROVE
+========================= */
 
 async function approvePayment(
   paymentId
 ) {
 
-  if (
-    !confirm(
+  const ok =
+    confirm(
       "Setujui pembayaran #" +
       paymentId +
-      "?"
-    )
-  ) {
+      " dan aktifkan paket pelanggan?"
+    );
+
+  if (!ok) {
     return;
   }
 
@@ -717,25 +2023,37 @@ async function approvePayment(
 
   } catch (error) {
 
+    console.error(
+      error
+    );
+
     showMessage(
-      error.message,
+      error.message ||
+      "Gagal menyetujui pembayaran.",
       "error"
     );
 
   }
+
 }
+
+
+/* =========================
+   UPDATE / REJECT
+========================= */
 
 async function rejectPayment(
   paymentId
 ) {
 
-  if (
-    !confirm(
+  const ok =
+    confirm(
       "Tolak pembayaran #" +
       paymentId +
       "?"
-    )
-  ) {
+    );
+
+  if (!ok) {
     return;
   }
 
@@ -759,29 +2077,71 @@ async function rejectPayment(
 
     showMessage(
       data?.message ||
-      "Pembayaran ditolak."
+      "Pembayaran berhasil ditolak."
     );
 
     await loadPayments();
 
   } catch (error) {
 
+    console.error(
+      error
+    );
+
     showMessage(
-      error.message,
+      error.message ||
+      "Gagal menolak pembayaran.",
       "error"
     );
 
   }
+
 }
 
-async function logout() {
 
-  await db.auth.signOut();
+/* =========================
+   UI
+========================= */
 
-  location.reload();
+function toggleSidebar() {
+
+  document
+    .getElementById(
+      "sidebar"
+    )
+    .classList
+    .toggle("open");
+
 }
 
-checkAdmin();
+
+function showPayments() {
+
+  document
+    .getElementById(
+      "sidebar"
+    )
+    .classList
+    .remove("open");
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+if (!db) {
+
+  showLoginMessage(
+    "Supabase client tidak tersedia."
+  );
+
+} else {
+
+  checkAdmin();
+
+}
 </script>
 
 </body>
