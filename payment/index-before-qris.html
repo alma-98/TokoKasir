@@ -403,58 +403,25 @@ function renderPayment(payment) {
     ${
       payment.status === "pending"
       ? `
-        
-<div class="bank qris-payment">
-  <div class="bank-title">
-    PEMBAYARAN QRIS
-  </div>
+        <div class="bank">
 
-  <p style="
-    text-align:center;
-    color:#64748b;
-    line-height:1.6;
-    margin:12px 0 18px;
-  ">
-    Scan QRIS untuk menyelesaikan pembayaran paket TokoKasir.
-  </p>
+          <div class="bank-title">
+            TRANSFER PEMBAYARAN KE
+          </div>
 
-  <div style="
-    max-width:420px;
-    margin:0 auto;
-    padding:14px;
-    background:#fff;
-    border-radius:20px;
-  ">
-    <img
-      src="qris-tokopeluang.png"
-      alt="QRIS Pembayaran TokoKasir"
-      style="
-        display:block;
-        width:100%;
-        height:auto;
-        border-radius:12px;
-      "
-    >
-  </div>
+          <div class="bank-name">
+            Bank Mandiri
+          </div>
 
-  <div style="
-    text-align:center;
-    font-weight:800;
-    margin-top:18px;
-  ">
-    Founder Investment Technology Indonesia
-  </div>
+          <div class="account-number">
+            1670003828281
+          </div>
 
-  <div style="
-    text-align:center;
-    color:#64748b;
-    font-size:14px;
-    margin-top:8px;
-  ">
-    Bayar sesuai total pembayaran yang tertera di atas.
-  </div>
-</div>
+          <div style="margin-top:8px">
+            a.n. Alma
+          </div>
 
+        </div>
       `
       : ""
     }

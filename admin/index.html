@@ -93,6 +93,8 @@ Refresh Data
 </div>
 
 <script>
+const API_BASE = "http://localhost:3000";
+
 const API = "http://localhost:3000";
 let adminToken =
   localStorage.getItem("tokokasir_admin_token");
@@ -105,7 +107,7 @@ document.getElementById("adminLogin")
   try{
 
     const response = await fetch(
-      API + "/api/auth/login",
+      API + "http://localhost:3000/api/auth/login",
       {
         method:"POST",
         headers:{
@@ -165,7 +167,7 @@ async function loadPayments(){
   try {
 
     const response = await fetch(
-      API + "/api/admin/payments",
+      API + "http://localhost:3000/api/admin/payments",
       {
         cache: "no-store",
         headers:{
@@ -266,7 +268,7 @@ async function approvePayment(id){
 
   const response = await fetch(
     API +
-    "/api/admin/payments/" +
+    "http://localhost:3000/api/admin/payments/" +
     id +
     "/approve",
     {
@@ -301,7 +303,7 @@ async function rejectPayment(id){
 
     const response = await fetch(
       API +
-      "/api/admin/payments/" +
+      "http://localhost:3000/api/admin/payments/" +
       id +
       "/reject",
       {

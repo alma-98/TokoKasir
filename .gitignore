@@ -1,17 +1,15 @@
 # macOS
 .DS_Store
 
-# Environment / Secrets
+# Environment & secrets
 .env
 .env.*
 !.env.example
 server/.env
 server/.env.*
-
 # Dependencies
 node_modules/
 server/node_modules/
-
 # Database
 *.db
 *.db-shm
@@ -19,14 +17,20 @@ server/node_modules/
 server/data/*.db
 server/data/*.db-shm
 server/data/*.db-wal
-
-# Uploads
-uploads/
-server/uploads/
-
 # Logs
 *.log
 npm-debug.log*
-
-# Temporary files
-*.tmp
+# Local backup
+.backup-payment-*/
+!server/.env.example
+server/backups/
+# Environment & Secrets
+# Local Database
+server/data/
+# Backups
+backups/
+*.bak
+*.bak-*
+*-backup-*.js
+# Supabase local temporary files
+supabase/.temp/

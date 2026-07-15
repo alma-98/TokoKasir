@@ -186,6 +186,8 @@ Buka Aplikasi TokoKasir
 </div>
 
 <script>
+const API_BASE = "http://localhost:3000";
+
 const API = "http://localhost:3000";
 let token = localStorage.getItem("tokokasir_token");
 
@@ -310,7 +312,7 @@ async function loadAccount(){
 
 async function checkout(plan){
   try{
-    const data = await api("/api/subscriptions/checkout", {
+    const data = await api("/api/payments", {
       method:"POST",
       body:JSON.stringify({plan})
     });
