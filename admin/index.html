@@ -679,6 +679,152 @@ tr:hover td {
 
 </style>
 
+
+<style id="TOKOKASIR_TRANSACTION_DETAIL_STYLE">
+
+.transaction-detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, .65);
+}
+
+.transaction-detail-modal.show {
+  display: flex;
+}
+
+.transaction-detail-card {
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 30px 90px rgba(15, 23, 42, .30);
+}
+
+.transaction-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.transaction-detail-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 21px;
+}
+
+.transaction-detail-close {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.transaction-detail-body {
+  padding: 24px;
+}
+
+.transaction-detail-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.transaction-detail-row {
+  display: grid;
+  grid-template-columns: minmax(130px, .8fr) minmax(0, 1.4fr);
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.transaction-detail-label {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.transaction-detail-value {
+  color: #0f172a;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.transaction-status-badge {
+  display: inline-flex;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.transaction-status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.transaction-status-badge.approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.transaction-status-badge.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.btn-view-transaction {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.btn-view-transaction:hover {
+  background: #f8fafc;
+}
+
+.transaction-detail-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.transaction-detail-actions button {
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 11px;
+  background: #0f172a;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+
+  .transaction-detail-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+}
+
+</style>
+
 </head>
 
 <body>
@@ -1817,6 +1963,15 @@ function renderPayments(
 
                 <div class="table-actions">
                   ${actions}
+          
+          <button
+            type="button"
+            class="btn btn-view-transaction"
+            onclick="viewTransaction(${payment.id})"
+          >
+            Lihat Transaksi
+          </button>
+
           <button
             type="button"
             class="btn btn-delete-payment"
@@ -2310,7 +2465,430 @@ window.deletePayment =
   deletePayment;
 
 
+
+// ==========================================================
+// TOKOKASIR_TRANSACTION_DETAIL_FUNCTION
+// RIWAYAT + DETAIL TRANSAKSI ADMIN
+// ==========================================================
+
+function escapeTransactionHtml(value) {
+
+  return String(
+    value ?? "-"
+  )
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+
+function formatTransactionMoney(value) {
+
+  return "Rp" +
+    Number(value || 0)
+      .toLocaleString("id-ID");
+
+}
+
+
+function formatTransactionDate(value) {
+
+  if (!value) {
+    return "-";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "-";
+  }
+
+  return date.toLocaleString(
+    "id-ID",
+    {
+      dateStyle: "long",
+      timeStyle: "short"
+    }
+  );
+
+}
+
+
+async function viewTransaction(paymentId) {
+
+  const numericPaymentId =
+    Number(paymentId);
+
+  if (
+    !Number.isInteger(
+      numericPaymentId
+    )
+  ) {
+
+    showMessage(
+      "ID transaksi tidak valid.",
+      "error"
+    );
+
+    return;
+  }
+
+  const modal =
+    document.getElementById(
+      "transactionDetailModal"
+    );
+
+  const content =
+    document.getElementById(
+      "transactionDetailContent"
+    );
+
+  if (
+    !modal ||
+    !content
+  ) {
+    return;
+  }
+
+  modal.classList.add(
+    "show"
+  );
+
+  content.innerHTML =
+    "Memuat detail transaksi...";
+
+  try {
+
+    const {
+      data: payment,
+      error
+    } =
+      await db
+        .from("payments")
+        .select("*")
+        .eq(
+          "id",
+          numericPaymentId
+        )
+        .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    if (!payment) {
+
+      throw new Error(
+        "Transaksi tidak ditemukan."
+      );
+
+    }
+
+    let customerName =
+      payment.customer_name ||
+      payment.name ||
+      payment.business_name ||
+      "-";
+
+    let customerEmail =
+      payment.customer_email ||
+      payment.email ||
+      "-";
+
+    /*
+     * Jika data customer tidak disimpan langsung
+     * pada payment, coba baca profile berdasarkan UUID.
+     */
+    if (
+      payment.auth_user_id &&
+      (
+        customerName === "-" ||
+        customerEmail === "-"
+      )
+    ) {
+
+      try {
+
+        const {
+          data: profile
+        } =
+          await db
+            .from("profiles")
+            .select("*")
+            .eq(
+              "id",
+              payment.auth_user_id
+            )
+            .maybeSingle();
+
+        if (profile) {
+
+          customerName =
+            profile.name ||
+            profile.business_name ||
+            customerName;
+
+          customerEmail =
+            profile.email ||
+            customerEmail;
+
+        }
+
+      } catch (
+        profileError
+      ) {
+
+        console.warn(
+          "PROFILE DETAIL ERROR:",
+          profileError
+        );
+
+      }
+
+    }
+
+    const status =
+      String(
+        payment.status ||
+        "pending"
+      ).toLowerCase();
+
+    const plan =
+      String(
+        payment.plan ||
+        "-"
+      ).toUpperCase();
+
+    content.innerHTML = `
+
+      <div class="transaction-detail-grid">
+
+        <div class="transaction-detail-row">
+          <div class="transaction-detail-label">
+            ID Transaksi
+          </div>
+
+          <div class="transaction-detail-value">
+            #${escapeTransactionHtml(payment.id)}
+          </div>
+        </div>
+
+
+        <div class="transaction-detail-row">
+          <div class="transaction-detail-label">
+            Customer
+          </div>
+
+          <div class="transaction-detail-value">
+            ${escapeTransactionHtml(customerName)}
+          </div>
+        </div>
+
+
+        <div class="transaction-detail-row">
+          <div class="transaction-detail-label">
+            Email
+          </div>
+
+          <div class="transaction-detail-value">
+            ${escapeTransactionHtml(customerEmail)}
+          </div>
+        </div>
+
+
+        <div class="transaction-detail-row">
+          <div class="transaction-detail-label">
+            Paket
+          </div>
+
+          <div class="transaction-detail-value">
+            ${escapeTransactionHtml(plan)}
+          </div>
+        </div>
+
+
+        <div class="transaction-detail-row">
+          <div class="transaction-detail-label">
+            Nominal
+          </div>
+
+          <div class="transaction-detail-value">
+            ${formatTransactionMoney(payment.amount)}
+          </div>
+        </div>
+
+
+        <div class="transaction-detail-row">
+          <div class="transaction-detail-label">
+            Status
+          </div>
+
+          <div class="transaction-detail-value">
+
+            <span
+              class="
+                transaction-status-badge
+                ${escapeTransactionHtml(status)}
+              "
+            >
+              ${escapeTransactionHtml(status)}
+            </span>
+
+          </div>
+        </div>
+
+
+        <div class="transaction-detail-row">
+          <div class="transaction-detail-label">
+            Metode Pembayaran
+          </div>
+
+          <div class="transaction-detail-value">
+            ${escapeTransactionHtml(
+              payment.payment_method ||
+              "QRIS"
+            )}
+          </div>
+        </div>
+
+
+        <div class="transaction-detail-row">
+          <div class="transaction-detail-label">
+            Tanggal Transaksi
+          </div>
+
+          <div class="transaction-detail-value">
+            ${escapeTransactionHtml(
+              formatTransactionDate(
+                payment.created_at
+              )
+            )}
+          </div>
+        </div>
+
+
+        <div class="transaction-detail-row">
+          <div class="transaction-detail-label">
+            User ID
+          </div>
+
+          <div class="transaction-detail-value">
+            ${escapeTransactionHtml(
+              payment.auth_user_id ||
+              "-"
+            )}
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="transaction-detail-actions">
+
+        <button
+          type="button"
+          onclick="closeTransactionDetail()"
+        >
+          Tutup
+        </button>
+
+      </div>
+
+    `;
+
+  } catch (error) {
+
+    console.error(
+      "VIEW TRANSACTION ERROR:",
+      error
+    );
+
+    content.innerHTML = `
+      <div style="
+        padding:18px;
+        border-radius:12px;
+        background:#fee2e2;
+        color:#991b1b;
+        line-height:1.6;
+      ">
+        ${escapeTransactionHtml(
+          error.message ||
+          "Gagal memuat transaksi."
+        )}
+      </div>
+    `;
+
+  }
+
+}
+
+
+function closeTransactionDetail() {
+
+  document
+    .getElementById(
+      "transactionDetailModal"
+    )
+    ?.classList
+    .remove("show");
+
+}
+
+
+window.viewTransaction =
+  viewTransaction;
+
+window.closeTransactionDetail =
+  closeTransactionDetail;
+
+
 </script>
+
+
+<div
+  id="transactionDetailModal"
+  class="transaction-detail-modal"
+  onclick="
+    if (event.target === this) {
+      closeTransactionDetail();
+    }
+  "
+>
+  <div class="transaction-detail-card">
+
+    <div class="transaction-detail-header">
+
+      <h2>
+        Detail Transaksi
+      </h2>
+
+      <button
+        type="button"
+        class="transaction-detail-close"
+        onclick="closeTransactionDetail()"
+        aria-label="Tutup"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div
+      id="transactionDetailContent"
+      class="transaction-detail-body"
+    >
+      Memuat detail transaksi...
+    </div>
+
+  </div>
+</div>
 
 </body>
 </html>
