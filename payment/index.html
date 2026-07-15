@@ -432,16 +432,6 @@ window.loadPayment = async function loadPayment() {
 
   try {
 
-    content.innerHTML = `
-      <div style="
-        padding:30px;
-        text-align:center;
-      ">
-        Memuat informasi pembayaran...
-      </div>
-    `;
-
-    // Ambil user Supabase yang sedang login
     const {
       data: {
         user
@@ -470,17 +460,21 @@ window.loadPayment = async function loadPayment() {
 
     }
 
-    console.log(
-      "LOAD PAYMENT:",
-      {
-        payment_id: paymentId,
-        auth_user_id: user.id
-      }
-    );
+    const numericPaymentId =
+      Number(paymentId);
 
-    // Payment ID adalah bigint.
-    // User Auth adalah UUID.
-    // Jangan bandingkan UUID dengan kolom id bigint.
+    if (
+      !Number.isInteger(
+        numericPaymentId
+      )
+    ) {
+
+      throw new Error(
+        "ID pembayaran tidak valid."
+      );
+
+    }
+
     const {
       data: payment,
       error: paymentError
@@ -490,7 +484,7 @@ window.loadPayment = async function loadPayment() {
         .select("*")
         .eq(
           "id",
-          Number(paymentId)
+          numericPaymentId
         )
         .eq(
           "auth_user_id",
@@ -501,7 +495,7 @@ window.loadPayment = async function loadPayment() {
     if (paymentError) {
 
       console.error(
-        "PAYMENT LOAD ERROR:",
+        "PAYMENT STATUS ERROR:",
         paymentError
       );
 
@@ -511,7 +505,7 @@ window.loadPayment = async function loadPayment() {
     if (!payment) {
 
       throw new Error(
-        "Tagihan tidak ditemukan atau bukan milik akun ini."
+        "Tagihan tidak ditemukan."
       );
 
     }
@@ -529,7 +523,7 @@ window.loadPayment = async function loadPayment() {
 
     showError(
       error.message ||
-      "Gagal memuat informasi pembayaran."
+      "Gagal memuat status pembayaran."
     );
 
   }
@@ -555,8 +549,8 @@ function renderPayment(payment) {
 
     statusHtml = `
       <div class="status approved">
-        ✓ Pembayaran telah diverifikasi.<br>
-        Paket ${planLabel} sudah aktif.
+        ✓ Pembayaran Berhasil<br>
+        Paket ${planLabel} sudah aktif selama 30 hari.
       </div>
     `;
 

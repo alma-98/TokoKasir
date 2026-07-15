@@ -1981,22 +1981,25 @@ function modalBackdrop(
    UPDATE / APPROVE
 ========================= */
 
-async function approvePayment(
-  paymentId
-) {
+async function approvePayment(paymentId) {
 
-  const ok =
-    confirm(
-      "Setujui pembayaran #" +
-      paymentId +
-      " dan aktifkan paket pelanggan?"
-    );
+  const ok = confirm(
+    "Setujui pembayaran #" +
+    paymentId +
+    " dan aktifkan paket pelanggan selama 30 hari?"
+  );
 
   if (!ok) {
     return;
   }
 
   try {
+
+    showMessage(
+      "Memproses persetujuan pembayaran #" +
+      paymentId +
+      "..."
+    );
 
     const {
       data,
@@ -2006,17 +2009,30 @@ async function approvePayment(
         "approve_tokokasir_payment",
         {
           p_payment_id:
-            paymentId
+            Number(paymentId)
         }
       );
 
     if (error) {
+
+      console.error(
+        "APPROVE RPC ERROR:",
+        error
+      );
+
       throw error;
     }
 
+    console.log(
+      "APPROVE RESULT:",
+      data
+    );
+
     showMessage(
       data?.message ||
-      "Pembayaran berhasil disetujui."
+      "Pembayaran #" +
+      paymentId +
+      " berhasil disetujui."
     );
 
     await loadPayments();
@@ -2024,6 +2040,7 @@ async function approvePayment(
   } catch (error) {
 
     console.error(
+      "APPROVE PAYMENT ERROR:",
       error
     );
 
@@ -2042,22 +2059,25 @@ async function approvePayment(
    UPDATE / REJECT
 ========================= */
 
-async function rejectPayment(
-  paymentId
-) {
+async function rejectPayment(paymentId) {
 
-  const ok =
-    confirm(
-      "Tolak pembayaran #" +
-      paymentId +
-      "?"
-    );
+  const ok = confirm(
+    "Tolak pembayaran #" +
+    paymentId +
+    "?"
+  );
 
   if (!ok) {
     return;
   }
 
   try {
+
+    showMessage(
+      "Memproses penolakan pembayaran #" +
+      paymentId +
+      "..."
+    );
 
     const {
       data,
@@ -2067,17 +2087,30 @@ async function rejectPayment(
         "reject_tokokasir_payment",
         {
           p_payment_id:
-            paymentId
+            Number(paymentId)
         }
       );
 
     if (error) {
+
+      console.error(
+        "REJECT RPC ERROR:",
+        error
+      );
+
       throw error;
     }
 
+    console.log(
+      "REJECT RESULT:",
+      data
+    );
+
     showMessage(
       data?.message ||
-      "Pembayaran berhasil ditolak."
+      "Pembayaran #" +
+      paymentId +
+      " berhasil ditolak."
     );
 
     await loadPayments();
@@ -2085,6 +2118,7 @@ async function rejectPayment(
   } catch (error) {
 
     console.error(
+      "REJECT PAYMENT ERROR:",
       error
     );
 
