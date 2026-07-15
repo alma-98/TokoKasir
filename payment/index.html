@@ -355,29 +355,7 @@ h1{
 
 <body>
 
-<a
-  id="paymentBackButton"
-  href="https://alma-98.github.io/TokoKasir/account/"
-  style="
-    position:fixed;
-    top:18px;
-    left:18px;
-    z-index:99999;
-    display:inline-flex;
-    align-items:center;
-    padding:12px 18px;
-    background:#ffffff;
-    color:#0f172a;
-    border:1px solid #e2e8f0;
-    border-radius:12px;
-    text-decoration:none;
-    font-weight:700;
-    cursor:pointer;
-    box-shadow:0 8px 24px rgba(15,23,42,.12);
-  "
->
-  ← Kembali ke Akun
-</a>
+
 
 
 
@@ -585,9 +563,7 @@ function renderPayment(payment) {
     actionHtml = `
       
 
-      <a class="btn secondary" href="/TokoKasir/account/">
-        Lihat Akun
-      </a>
+      
     `;
 
   } else if (payment.status === "rejected") {
@@ -599,9 +575,7 @@ function renderPayment(payment) {
     `;
 
     actionHtml = `
-      <a class="btn primary" href="/TokoKasir/account/">
-        Pilih Paket Lagi
-      </a>
+      
     `;
 
   } else {
@@ -622,12 +596,7 @@ function renderPayment(payment) {
         Cek Status Pembayaran
       </button>
 
-      <a
-        class="btn secondary"
-        href="/TokoKasir/account/"
-      >
-        Kembali ke Akun
-      </a>
+      
     `;
 
   }
@@ -834,12 +803,7 @@ function showError(message) {
 
       ${actionHtml}
 
-      <a
-        class="btn secondary"
-        href="/TokoKasir/account/"
-      >
-        ← Kembali ke Akun
-      </a>
+      
 
       <a
         class="main-website-button"
@@ -893,9 +857,7 @@ function showError(message) {
             "Terjadi kesalahan."
           )}
           <br><br>
-          <a href="/TokoKasir/account/">
-            ← Kembali ke Akun
-          </a>
+          
         </div>
       `;
     }
@@ -907,13 +869,7 @@ function showError(message) {
 
 
 <div style="width:min(680px,calc(100% - 32px));margin:0 auto 48px;">
-  <a
-    class="btn secondary"
-    href="/TokoKasir/"
-    style="display:block;text-align:center;text-decoration:none;"
-  >
-    ← Kembali ke Website TokoKasir
-  </a>
+  
 </div>
 
 </body>
