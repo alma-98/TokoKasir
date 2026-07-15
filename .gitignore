@@ -34,3 +34,6 @@ backups/
 *-backup-*.js
 # Supabase local temporary files
 supabase/.temp/
+# Secrets
+# Local DB
+# Supabase temp

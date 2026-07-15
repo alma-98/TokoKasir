@@ -185,10 +185,11 @@ Buka Aplikasi TokoKasir
 </main>
 </div>
 
+<script src="../config/api.js"></script>
 <script>
-const API_BASE = "http://localhost:3000";
+const API_BASE = window.TOKOKASIR_API_URL;
 
-const API = "http://localhost:3000";
+const API = window.TOKOKASIR_API_URL;
 let token = localStorage.getItem("tokokasir_token");
 
 function showTab(name, button){
@@ -365,6 +366,7 @@ function logout(){
 
 loadAccount();
 </script>
+
 
 </body>
 </html>
