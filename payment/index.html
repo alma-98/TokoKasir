@@ -384,7 +384,7 @@ if (!paymentId) {
 
 } else {
 
-  loadPayment();
+
 
 }
 
@@ -796,6 +796,54 @@ function showError(message) {
 
   `;
 }
+
+
+// ==================================================
+// TOKOKASIR PAYMENT STARTUP
+// Jalankan setelah seluruh function selesai dibuat.
+// ==================================================
+(async function startTokoKasirPayment() {
+  try {
+    if (typeof window.loadPayment !== "function") {
+      throw new Error(
+        "Fungsi loadPayment belum tersedia."
+      );
+    }
+
+    await window.loadPayment();
+
+  } catch (error) {
+    console.error(
+      "PAYMENT STARTUP ERROR:",
+      error
+    );
+
+    const target =
+      document.getElementById("content");
+
+    if (target) {
+      target.innerHTML = `
+        <div style="
+          padding:24px;
+          background:#fee2e2;
+          color:#991b1b;
+          border-radius:14px;
+          line-height:1.6;
+        ">
+          <strong>Gagal memuat pembayaran.</strong><br>
+          ${String(
+            error.message ||
+            "Terjadi kesalahan."
+          )}
+          <br><br>
+          <a href="/TokoKasir/account/">
+            ← Kembali ke Akun
+          </a>
+        </div>
+      `;
+    }
+  }
+})();
 
 </script>
 
