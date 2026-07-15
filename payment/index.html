@@ -190,6 +190,111 @@ h1{
   .row{align-items:flex-start}
 }
 </style>
+
+<style id="TOKOKASIR_QRIS_PAYMENT_STYLE">
+
+.qris-payment-box {
+  margin: 24px 0;
+  padding: 24px;
+  text-align: center;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+}
+
+.qris-payment-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.qris-payment-description {
+  margin: 0 auto 20px;
+  max-width: 500px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.qris-image-wrapper {
+  max-width: 380px;
+  margin: 0 auto;
+  padding: 14px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+}
+
+.qris-payment-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.qris-amount {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 14px;
+}
+
+.qris-amount-label {
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.qris-amount-value {
+  font-size: 28px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.qris-instructions {
+  margin-top: 20px;
+  padding: 18px;
+  text-align: left;
+  background: #f8fafc;
+  border-radius: 14px;
+  color: #334155;
+  line-height: 1.7;
+}
+
+.qris-instructions strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+.payment-warning {
+  margin-top: 16px;
+  padding: 14px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+
+  .qris-payment-box {
+    padding: 16px;
+  }
+
+  .qris-image-wrapper {
+    padding: 8px;
+  }
+
+  .qris-amount-value {
+    font-size: 24px;
+  }
+
+}
+
+</style>
+
 </head>
 
 <body>
@@ -553,16 +658,121 @@ function showError(message) {
   div.textContent = message;
 
   content.innerHTML = `
-    <div class="status error">
-      ${div.innerHTML}
+
+    <div class="invoice">
+
+      <div class="row">
+        <span>ID Pembayaran</span>
+        <strong>#${payment.id}</strong>
+      </div>
+
+      <div class="row">
+        <span>Paket</span>
+        <strong>${planLabel}</strong>
+      </div>
+
+      <div class="row">
+        <span>Total Pembayaran</span>
+        <strong>Rp${amount}</strong>
+      </div>
+
     </div>
 
-    <a
-      class="btn secondary"
-      href="/TokoKasir/account/"
-    >
-      Kembali ke Akun
-    </a>
+
+    ${
+      payment.status === "pending"
+        ? `
+
+        <div class="qris-payment-box">
+
+          <h2 class="qris-payment-title">
+            Bayar dengan QRIS
+          </h2>
+
+          <p class="qris-payment-description">
+            Scan QRIS di bawah menggunakan aplikasi
+            mobile banking atau e-wallet Anda.
+          </p>
+
+          <div class="qris-image-wrapper">
+
+            <img
+              src="/TokoKasir/assets/payment/qris-tokokasir.png"
+              alt="QRIS Pembayaran TokoKasir"
+              class="qris-payment-image"
+            >
+
+          </div>
+
+          <div class="qris-amount">
+
+            <div class="qris-amount-label">
+              Total yang harus dibayar
+            </div>
+
+            <div class="qris-amount-value">
+              Rp${amount}
+            </div>
+
+          </div>
+
+          <div class="qris-instructions">
+
+            <strong>
+              Cara Pembayaran:
+            </strong>
+
+            1. Buka aplikasi mobile banking atau e-wallet.<br>
+            2. Pilih menu Scan QRIS.<br>
+            3. Scan QRIS di atas.<br>
+            4. Masukkan nominal pembayaran sebesar
+            <strong style="display:inline">
+              Rp${amount}
+            </strong>.<br>
+            5. Selesaikan pembayaran.<br>
+            6. Klik tombol
+            <strong style="display:inline">
+              Cek Status Pembayaran
+            </strong>
+            setelah pembayaran diverifikasi.
+
+          </div>
+
+          <div class="payment-warning">
+            Pastikan nominal pembayaran sesuai dengan
+            total tagihan agar pembayaran dapat diverifikasi.
+          </div>
+
+        </div>
+
+        `
+        : ""
+    }
+
+
+    ${statusHtml}
+
+
+    <div class="actions">
+
+      ${actionHtml}
+
+      <a
+        class="btn secondary"
+        href="/TokoKasir/account/"
+      >
+        ← Kembali ke Akun
+      </a>
+
+      <a
+        class="btn secondary"
+        href="/TokoKasir/"
+      >
+        ← Kembali ke Website
+      </a>
+
+    </div>
+
   `;
 }
 
