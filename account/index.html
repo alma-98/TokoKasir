@@ -555,24 +555,19 @@ async function checkout(plan) {
 
   try {
 
+    const normalizedPlan =
+      String(plan || "")
+        .toLowerCase();
+
     if (
-      plan !== "pro" &&
-      plan !== "business"
+      normalizedPlan !== "pro" &&
+      normalizedPlan !== "business"
     ) {
       throw new Error(
         "Paket tidak valid."
       );
     }
 
-    showMessage(
-      "Membuat tagihan " +
-      plan.toUpperCase() +
-      "...",
-      "success",
-      "dashboardMessage"
-    );
-
-    // Ambil user Supabase yang sedang login
     const {
       data: {
         user
@@ -586,20 +581,38 @@ async function checkout(plan) {
     }
 
     if (!user) {
-
       throw new Error(
         "Silakan login terlebih dahulu."
       );
-
     }
 
-    // Harga paket
     const amount =
-      plan === "business"
+      normalizedPlan === "business"
         ? 299000
         : 99000;
 
-    // Buat payment langsung di Supabase
+    console.log(
+      "CREATE PAYMENT:",
+      {
+        auth_user_id: user.id,
+        plan: normalizedPlan,
+        amount
+      }
+    );
+
+    /*
+     * PENTING:
+     *
+     * user.id dari Supabase Auth adalah UUID.
+     * UUID hanya dimasukkan ke auth_user_id.
+     *
+     * JANGAN masukkan user.id ke:
+     * - payments.user_id
+     * - payments.id
+     *
+     * karena kolom tersebut bertipe bigint.
+     */
+
     const {
       data: payment,
       error: paymentError
@@ -607,41 +620,44 @@ async function checkout(plan) {
       await db
         .from("payments")
         .insert({
-          auth_user_id: user.id,
-          plan: plan,
-          amount: amount,
-          status: "pending",
-          payment_method: "qris"
+          auth_user_id:
+            user.id,
+
+          plan:
+            normalizedPlan,
+
+          amount:
+            amount,
+
+          status:
+            "pending",
+
+          payment_method:
+            "qris"
         })
-        .select()
+        .select("*")
         .single();
 
     if (paymentError) {
 
       console.error(
-        "CREATE PAYMENT ERROR:",
+        "SUPABASE PAYMENT ERROR:",
         paymentError
       );
 
-      throw new Error(
-        paymentError.message ||
-        "Gagal membuat tagihan."
-      );
-
+      throw paymentError;
     }
 
     if (
       !payment ||
-      !payment.id
+      payment.id === null ||
+      payment.id === undefined
     ) {
-
       throw new Error(
         "ID pembayaran tidak berhasil dibuat."
       );
-
     }
 
-    // Langsung ke halaman QRIS
     window.location.href =
       "/TokoKasir/payment/?payment_id=" +
       encodeURIComponent(
