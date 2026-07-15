@@ -67,7 +67,7 @@ li{padding:8px 0}
 <li>✓ Export CSV</li>
 <li>✓ AI Insight</li>
 </ul>
-<a class="btn" href="../payment/?plan=pro">Coba Demo Pro</a>
+<button class="btn"  type="button" onclick="openTokoKasirPlan(\'pro\')">🔒 Pilih Pro</button>
 </div>
 
 <div class="card business">
@@ -83,7 +83,7 @@ li{padding:8px 0}
 <li>✓ Advanced Report</li>
 <li>✓ AI Business Intelligence</li>
 </ul>
-<a class="btn" href="../payment/?plan=business">Coba Demo Business</a>
+<button class="btn"  type="button" onclick="openTokoKasirPlan(\'business\')">🔒 Pilih Business</button>
 </div>
 
 </div>
@@ -91,5 +91,60 @@ li{padding:8px 0}
 <a class="back" href="../">← Kembali ke Website TokoKasir</a>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/TokoKasir/config/supabase-config.js"></script>
+<script src="/TokoKasir/config/supabase-client.js"></script>
+<script src="/TokoKasir/config/plan-guard.js"></script>
+
+<script>
+async function openTokoKasirPlan(plan) {
+
+  try {
+
+    if (plan === "free") {
+      window.location.href =
+        "/TokoKasir/app/?plan=free";
+
+      return;
+    }
+
+    const access =
+      await window
+        .TokoKasirPlanGuard
+        .canAccess(plan);
+
+    if (!access.loggedIn) {
+
+      window.location.href =
+        "/TokoKasir/account/?upgrade=" +
+        encodeURIComponent(plan);
+
+      return;
+    }
+
+    if (!access.allowed) {
+
+      window.location.href =
+        "/TokoKasir/account/?upgrade=" +
+        encodeURIComponent(plan);
+
+      return;
+    }
+
+    window.location.href =
+      "/TokoKasir/app/?plan=" +
+      encodeURIComponent(plan);
+
+  } catch (error) {
+
+    console.error(error);
+
+    window.location.href =
+      "/TokoKasir/account/";
+  }
+}
+</script>
+
 </body>
 </html>
