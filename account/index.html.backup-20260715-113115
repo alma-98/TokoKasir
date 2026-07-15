@@ -42,49 +42,9 @@ input{width:100%;padding:14px;border:1px solid #d8e0ea;border-radius:10px;outlin
 .open-app{display:block;text-align:center;text-decoration:none;background:#0f62fe;color:white;padding:14px;border-radius:10px;font-weight:800;margin-top:20px}
 @media(max-width:850px){.shell{grid-template-columns:1fr}.brand{padding:35px}.brand h1{font-size:34px}.main{padding:20px}.info,.plans{grid-template-columns:1fr}}
 </style>
-
-<style id="tokokasirBackStyle">
-#tokokasirBackButton {
-  position: fixed !important;
-  top: 16px !important;
-  left: 16px !important;
-  z-index: 2147483647 !important;
-  display: block !important;
-  width: auto !important;
-  padding: 12px 18px !important;
-  margin: 0 !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 12px !important;
-  background: #ffffff !important;
-  color: #0f172a !important;
-  font: inherit !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  pointer-events: auto !important;
-  box-shadow: 0 8px 24px rgba(15,23,42,.15) !important;
-}
-</style>
-
 </head>
 
 <body>
-
-<button
-  id="tokokasirBackButton"
-  type="button"
-  aria-label="Kembali ke Website"
->
-  ← Kembali ke Website
-</button>
-
-
-
-
-
-
-
-
-
 
 <div class="shell">
 
@@ -213,7 +173,9 @@ Pilih Business
   Refresh Status Paket
 </button>
 
-
+<a id="openApp" class="open-app" href="../app/">
+Buka Aplikasi TokoKasir
+</a>
 
 <div id="dashboardMessage" class="message"></div>
 
@@ -730,25 +692,6 @@ loadAccount();
 
 
 
-
-
-<script id="tokokasirBackScript">
-document.addEventListener("DOMContentLoaded", function () {
-  const backButton =
-    document.getElementById("tokokasirBackButton");
-
-  if (backButton) {
-    backButton.addEventListener("click", function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      window.location.replace(
-        "https://alma-98.github.io/TokoKasir/"
-      );
-    });
-  }
-});
-</script>
 
 </body>
 </html>
