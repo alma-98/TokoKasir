@@ -69,8 +69,183 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/app.css">
+
+<style id="TOKOKASIR_PLAN_GUARD_STYLE">
+
+/* =========================================================
+   TOKOKASIR PLAN ACCESS CONTROL
+   ========================================================= */
+
+.tk-plan-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.tk-plan-loading-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 30px;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 24px 70px rgba(15,23,42,.12);
+}
+
+.tk-plan-loading-logo {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.tk-plan-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 7px 11px;
+  margin-left: 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .04em;
+}
+
+.tk-plan-badge.free {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.tk-plan-badge.pro {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.tk-plan-badge.business {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.tk-plan-locked {
+  position: relative;
+  opacity: .55;
+  cursor: not-allowed !important;
+  user-select: none;
+}
+
+.tk-plan-locked::after {
+  content: "🔒";
+  margin-left: 7px;
+}
+
+.tk-plan-lock-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  cursor: not-allowed;
+  background: rgba(248,250,252,.55);
+  border-radius: inherit;
+}
+
+.tk-upgrade-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: none;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15,23,42,.58);
+}
+
+.tk-upgrade-modal.show {
+  display: grid;
+}
+
+.tk-upgrade-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 28px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 30px 90px rgba(15,23,42,.25);
+}
+
+.tk-upgrade-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  border-radius: 15px;
+  background: #f1f5f9;
+  font-size: 24px;
+}
+
+.tk-upgrade-card h2 {
+  margin: 0 0 10px;
+  color: #0f172a;
+}
+
+.tk-upgrade-card p {
+  margin: 0 0 22px;
+  color: #64748b;
+  line-height: 1.65;
+}
+
+.tk-upgrade-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.tk-upgrade-actions a,
+.tk-upgrade-actions button {
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 11px;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.tk-upgrade-primary {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.tk-upgrade-secondary {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+</style>
+
 </head>
 <body>
+<div id="tkPlanLoading" class="tk-plan-loading">
+  <div class="tk-plan-loading-card">
+    <div class="tk-plan-loading-logo">TK</div>
+    <strong>Memeriksa akses TokoKasir...</strong>
+    <p style="margin:10px 0 0;color:#64748b;">
+      Menghubungkan akun dan paket aktif.
+    </p>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <div id="appView" class="app-shell hidden">
@@ -136,7 +311,7 @@ DEMO PRO
         </div>
         <div class="panel ai-banner">
           <div class="ai-symbol">✦</div><div><small>TOKOKASIR AI</small><h3>Insight Bisnis Otomatis</h3><p id="dashboardAiText">Tambahkan transaksi untuk mendapatkan analisis penjualan.</p></div>
-          <button class="btn soft" data-open-page="ai">Lihat AI Insight</button>
+          <button data-required-plan="pro" class="btn soft" data-open-page="ai">Lihat AI Insight</button>
         </div>
       </section>
 
@@ -176,14 +351,14 @@ DEMO PRO
       </section>
 
       <section class="page" id="page-transactions">
-        <div class="page-actions"><div><h3>Riwayat Transaksi</h3><p>Semua transaksi penjualan tersimpan di sini.</p></div><button class="btn outline" id="exportTransactions">Export CSV</button></div>
+        <div class="page-actions"><div><h3>Riwayat Transaksi</h3><p>Semua transaksi penjualan tersimpan di sini.</p></div><button data-required-plan="pro" class="btn outline" id="exportTransactions">Export CSV</button></div>
         <div class="panel table-wrap">
           <table><thead><tr><th>ID</th><th>Waktu</th><th>Pelanggan</th><th>Item</th><th>Pembayaran</th><th>Total</th></tr></thead><tbody id="transactionTable"></tbody></table>
         </div>
       </section>
 
       <section class="page" id="page-customers">
-        <div class="page-actions"><div><h3>Database Pelanggan</h3><p>Bangun hubungan dan loyalitas pelanggan.</p></div><button class="btn primary" id="addCustomerBtn">+ Tambah Pelanggan</button></div>
+        <div class="page-actions"><div><h3>Database Pelanggan</h3><p>Bangun hubungan dan loyalitas pelanggan.</p></div><button data-required-plan="pro" class="btn primary" id="addCustomerBtn">+ Tambah Pelanggan</button></div>
         <div class="customer-grid" id="customerGrid"></div>
       </section>
 
@@ -255,7 +430,7 @@ DEMO PRO
       <label>Nama Pelanggan</label><input id="customerName" required>
       <label>Nomor WhatsApp</label><input id="customerPhone" placeholder="08xxxxxxxxxx">
       <label>Email</label><input id="customerEmail" type="email">
-      <button class="btn primary full" type="submit">Simpan Pelanggan</button>
+      <button data-required-plan="pro" class="btn primary full" type="submit">Simpan Pelanggan</button>
     </form>
   </div>
 </div>
@@ -276,11 +451,741 @@ DEMO PRO
     <div class="modal-head"><h3>Transaksi Berhasil</h3><button class="close-modal">×</button></div>
     <div id="receiptContent"></div>
     <button class="btn primary full" id="printReceipt">Cetak Struk</button>
-    <button class="btn soft full" id="whatsappReceipt">WhatsApp Receipt</button>
+    <button data-required-plan="pro" class="btn soft full" id="whatsappReceipt">WhatsApp Receipt</button>
   </div>
 </div>
 
 <script src="js/app.js"></script>
 <script src="js/subscription.js"></script>
+
+<div
+  id="tkUpgradeModal"
+  class="tk-upgrade-modal"
+  onclick="if(event.target===this) window.TokoKasirPlan.closeUpgrade()"
+>
+  <div class="tk-upgrade-card">
+
+    <div class="tk-upgrade-icon">
+      🔒
+    </div>
+
+    <h2 id="tkUpgradeTitle">
+      Fitur Terkunci
+    </h2>
+
+    <p id="tkUpgradeText">
+      Upgrade paket untuk menggunakan fitur ini.
+    </p>
+
+    <div class="tk-upgrade-actions">
+
+      <a
+        class="tk-upgrade-primary"
+        href="/TokoKasir/account/"
+      >
+        Lihat & Upgrade Paket
+      </a>
+
+      <button
+        type="button"
+        class="tk-upgrade-secondary"
+        onclick="window.TokoKasirPlan.closeUpgrade()"
+      >
+        Kembali ke Aplikasi
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/TokoKasir/config/supabase-config.js"></script>
+<script src="/TokoKasir/config/supabase-client.js"></script>
+
+<script id="TOKOKASIR_PLAN_GUARD_V1">
+(function () {
+
+  "use strict";
+
+  const PLAN_LEVEL = {
+    free: 0,
+    pro: 1,
+    business: 2
+  };
+
+  const PLAN_LABEL = {
+    free: "FREE",
+    pro: "PRO",
+    business: "BUSINESS"
+  };
+
+  let db = null;
+
+  const state = {
+    user: null,
+    profile: null,
+    plan: "free",
+    subscriptionStatus: "inactive",
+    subscriptionExpiresAt: null,
+    ready: false
+  };
+
+
+  function normalizePlan(value) {
+
+    const plan =
+      String(value || "free")
+        .trim()
+        .toLowerCase();
+
+    if (
+      plan === "pro" ||
+      plan === "business"
+    ) {
+      return plan;
+    }
+
+    return "free";
+  }
+
+
+  function isSubscriptionActive(profile) {
+
+    if (!profile) {
+      return false;
+    }
+
+    const plan =
+      normalizePlan(profile.plan);
+
+    if (plan === "free") {
+      return true;
+    }
+
+    const status =
+      String(
+        profile.subscription_status ||
+        ""
+      )
+        .toLowerCase();
+
+    if (status !== "active") {
+      return false;
+    }
+
+    const expiresAt =
+      profile.subscription_expires_at;
+
+    if (!expiresAt) {
+      return false;
+    }
+
+    const expires =
+      new Date(expiresAt);
+
+    if (
+      Number.isNaN(
+        expires.getTime()
+      )
+    ) {
+      return false;
+    }
+
+    return expires.getTime() > Date.now();
+  }
+
+
+  function resolveEffectivePlan(profile) {
+
+    const requested =
+      normalizePlan(
+        profile?.plan
+      );
+
+    if (requested === "free") {
+      return "free";
+    }
+
+    return isSubscriptionActive(profile)
+      ? requested
+      : "free";
+  }
+
+
+  function hasAccess(requiredPlan) {
+
+    const required =
+      normalizePlan(requiredPlan);
+
+    return (
+      PLAN_LEVEL[state.plan] >=
+      PLAN_LEVEL[required]
+    );
+  }
+
+
+  function hideLoading() {
+
+    const loading =
+      document.getElementById(
+        "tkPlanLoading"
+      );
+
+    if (loading) {
+      loading.remove();
+    }
+  }
+
+
+  function showFatal(message) {
+
+    const loading =
+      document.getElementById(
+        "tkPlanLoading"
+      );
+
+    if (!loading) {
+      alert(message);
+      return;
+    }
+
+    loading.innerHTML = `
+      <div class="tk-plan-loading-card">
+
+        <div class="tk-plan-loading-logo">
+          TK
+        </div>
+
+        <strong>
+          Aplikasi tidak dapat dibuka
+        </strong>
+
+        <p style="
+          margin:12px 0 20px;
+          color:#64748b;
+          line-height:1.6;
+        ">
+          ${String(message)}
+        </p>
+
+        <a
+          href="/TokoKasir/account/"
+          style="
+            display:block;
+            padding:13px 16px;
+            border-radius:10px;
+            background:#0f172a;
+            color:#fff;
+            font-weight:800;
+            text-decoration:none;
+          "
+        >
+          Kembali ke Akun
+        </a>
+
+      </div>
+    `;
+  }
+
+
+  function renderPlanBadge() {
+
+    document
+      .querySelectorAll(
+        ".tk-plan-badge"
+      )
+      .forEach(
+        element =>
+          element.remove()
+      );
+
+    const badge =
+      document.createElement(
+        "span"
+      );
+
+    badge.className =
+      "tk-plan-badge " +
+      state.plan;
+
+    badge.textContent =
+      PLAN_LABEL[state.plan];
+
+    const targets = [
+      document.querySelector(".user-name"),
+      document.querySelector(".profile-name"),
+      document.querySelector(".topbar h1"),
+      document.querySelector("header h1"),
+      document.querySelector(".brand"),
+      document.querySelector("h1")
+    ];
+
+    const target =
+      targets.find(Boolean);
+
+    if (target) {
+      target.appendChild(badge);
+    }
+  }
+
+
+  function showUpgrade(requiredPlan) {
+
+    const required =
+      normalizePlan(requiredPlan);
+
+    const modal =
+      document.getElementById(
+        "tkUpgradeModal"
+      );
+
+    const title =
+      document.getElementById(
+        "tkUpgradeTitle"
+      );
+
+    const text =
+      document.getElementById(
+        "tkUpgradeText"
+      );
+
+    if (!modal) {
+      return;
+    }
+
+    if (title) {
+      title.textContent =
+        "Fitur " +
+        PLAN_LABEL[required] +
+        " Terkunci";
+    }
+
+    if (text) {
+
+      text.textContent =
+        "Paket aktif Anda adalah " +
+        PLAN_LABEL[state.plan] +
+        ". Upgrade ke " +
+        PLAN_LABEL[required] +
+        " untuk menggunakan fitur ini.";
+
+    }
+
+    modal.classList.add(
+      "show"
+    );
+  }
+
+
+  function closeUpgrade() {
+
+    document
+      .getElementById(
+        "tkUpgradeModal"
+      )
+      ?.classList
+      .remove("show");
+  }
+
+
+  function lockElement(
+    element,
+    requiredPlan
+  ) {
+
+    if (
+      element.dataset
+        .tkPlanGuardApplied ===
+      "1"
+    ) {
+      return;
+    }
+
+    element.dataset
+      .tkPlanGuardApplied =
+      "1";
+
+    element.classList.add(
+      "tk-plan-locked"
+    );
+
+    element.setAttribute(
+      "aria-disabled",
+      "true"
+    );
+
+    element.addEventListener(
+      "click",
+      function (event) {
+
+        if (
+          !hasAccess(
+            requiredPlan
+          )
+        ) {
+
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+
+          showUpgrade(
+            requiredPlan
+          );
+
+          return false;
+        }
+
+      },
+      true
+    );
+  }
+
+
+  function applyPlanLocks() {
+
+    document
+      .querySelectorAll(
+        "[data-required-plan]"
+      )
+      .forEach(
+        element => {
+
+          const required =
+            normalizePlan(
+              element.dataset
+                .requiredPlan
+            );
+
+          if (
+            hasAccess(
+              required
+            )
+          ) {
+
+            element.classList.remove(
+              "tk-plan-locked"
+            );
+
+            element.removeAttribute(
+              "aria-disabled"
+            );
+
+          } else {
+
+            lockElement(
+              element,
+              required
+            );
+
+          }
+
+        }
+      );
+  }
+
+
+  function exposeBodyPlan() {
+
+    document.body.dataset
+      .tokokasirPlan =
+      state.plan;
+
+    document.body.dataset
+      .tokokasirSubscriptionStatus =
+      state.subscriptionStatus;
+  }
+
+
+  function protectNavigationClicks() {
+
+    document.addEventListener(
+      "click",
+      function (event) {
+
+        const target =
+          event.target.closest(
+            "[data-required-plan]"
+          );
+
+        if (!target) {
+          return;
+        }
+
+        const required =
+          normalizePlan(
+            target.dataset
+              .requiredPlan
+          );
+
+        if (
+          !hasAccess(
+            required
+          )
+        ) {
+
+          event.preventDefault();
+          event.stopPropagation();
+
+          showUpgrade(
+            required
+          );
+
+        }
+
+      },
+      true
+    );
+  }
+
+
+  async function loadProfile(user) {
+
+    const {
+      data,
+      error
+    } =
+      await db
+        .from("profiles")
+        .select(
+          "id, plan, subscription_status, subscription_expires_at"
+        )
+        .eq(
+          "id",
+          user.id
+        )
+        .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data) {
+
+      return {
+        id: user.id,
+        plan: "free",
+        subscription_status:
+          "active",
+        subscription_expires_at:
+          null
+      };
+
+    }
+
+    return data;
+  }
+
+
+  async function initialize() {
+
+    try {
+
+      db =
+        window.tokoKasirSupabase;
+
+      if (!db) {
+
+        throw new Error(
+          "Supabase client tidak tersedia."
+        );
+
+      }
+
+      const {
+        data: {
+          session
+        },
+        error: sessionError
+      } =
+        await db.auth
+          .getSession();
+
+      if (sessionError) {
+        throw sessionError;
+      }
+
+      if (!session) {
+
+        window.location.replace(
+          "/TokoKasir/account/"
+        );
+
+        return;
+      }
+
+      state.user =
+        session.user;
+
+      state.profile =
+        await loadProfile(
+          session.user
+        );
+
+      state.plan =
+        resolveEffectivePlan(
+          state.profile
+        );
+
+      state.subscriptionStatus =
+        state.plan === "free"
+          ? "active"
+          : String(
+              state.profile
+                .subscription_status ||
+              "inactive"
+            );
+
+      state.subscriptionExpiresAt =
+        state.profile
+          .subscription_expires_at ||
+        null;
+
+      state.ready =
+        true;
+
+      exposeBodyPlan();
+
+      renderPlanBadge();
+
+      applyPlanLocks();
+
+      hideLoading();
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "tokokasir:plan-ready",
+          {
+            detail: {
+              plan:
+                state.plan,
+
+              profile:
+                state.profile,
+
+              user:
+                state.user
+            }
+          }
+        )
+      );
+
+      console.log(
+        "TOKOKASIR PLAN READY:",
+        {
+          plan:
+            state.plan,
+
+          subscriptionStatus:
+            state.subscriptionStatus,
+
+          expiresAt:
+            state.subscriptionExpiresAt
+        }
+      );
+
+    } catch (error) {
+
+      console.error(
+        "TOKOKASIR PLAN GUARD ERROR:",
+        error
+      );
+
+      showFatal(
+        error.message ||
+        "Gagal memeriksa paket akun."
+      );
+
+    }
+
+  }
+
+
+  window.TokoKasirPlan = {
+
+    get plan() {
+      return state.plan;
+    },
+
+    get profile() {
+      return state.profile;
+    },
+
+    get user() {
+      return state.user;
+    },
+
+    get ready() {
+      return state.ready;
+    },
+
+    hasAccess,
+
+    require(requiredPlan) {
+
+      if (
+        hasAccess(
+          requiredPlan
+        )
+      ) {
+        return true;
+      }
+
+      showUpgrade(
+        requiredPlan
+      );
+
+      return false;
+    },
+
+    showUpgrade,
+
+    closeUpgrade,
+
+    refreshLocks:
+      applyPlanLocks
+
+  };
+
+
+  protectNavigationClicks();
+
+
+  const observer =
+    new MutationObserver(
+      function () {
+
+        if (
+          state.ready
+        ) {
+
+          applyPlanLocks();
+
+        }
+
+      }
+    );
+
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+      observer.observe(
+        document.body,
+        {
+          childList: true,
+          subtree: true
+        }
+      );
+
+      initialize();
+
+    }
+  );
+
+})();
+</script>
+
 </body>
 </html>
