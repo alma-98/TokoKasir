@@ -185,187 +185,512 @@ Buka Aplikasi TokoKasir
 </main>
 </div>
 
-<script src="../config/api.js"></script>
-<script>
-const API_BASE = window.TOKOKASIR_API_URL;
 
-const API = window.TOKOKASIR_API_URL;
-let token = localStorage.getItem("tokokasir_token");
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../config/supabase-config.js"></script>
+<script src="../config/supabase-client.js"></script>
+
+<script>
+const db = window.tokoKasirSupabase;
 
 function showTab(name, button){
-  document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
-  document.querySelectorAll(".form").forEach(x => x.classList.remove("active"));
+  document
+    .querySelectorAll(".tab")
+    .forEach(x =>
+      x.classList.remove("active")
+    );
+
+  document
+    .querySelectorAll(".form")
+    .forEach(x =>
+      x.classList.remove("active")
+    );
 
   button.classList.add("active");
-  document.getElementById(name + "Form").classList.add("active");
+
+  document
+    .getElementById(name + "Form")
+    .classList.add("active");
 
   hideMessage();
 }
 
-function showMessage(text, type="success", target="message"){
-  const el = document.getElementById(target);
+function showMessage(
+  text,
+  type = "success",
+  target = "message"
+){
+  const el =
+    document.getElementById(target);
+
+  if (!el) return;
+
   el.textContent = text;
-  el.className = "message show " + type;
+
+  el.className =
+    "message show " + type;
 }
 
 function hideMessage(){
-  document.getElementById("message").className = "message";
+  const el =
+    document.getElementById("message");
+
+  if (el) {
+    el.className = "message";
+  }
 }
 
-async function api(path, options={}){
-  options.headers = {
-    "Content-Type":"application/json",
-    ...(options.headers || {})
+function profileToUser(
+  profile,
+  authUser
+){
+  return {
+    name:
+      profile?.name ||
+      authUser?.user_metadata?.name ||
+      authUser?.email ||
+      "Pengguna TokoKasir",
+
+    email:
+      profile?.email ||
+      authUser?.email ||
+      "-",
+
+    plan:
+      profile?.plan ||
+      "free",
+
+    subscriptionStatus:
+      profile?.subscription_status ||
+      "active",
+
+    subscriptionExpiresAt:
+      profile?.subscription_expires_at ||
+      null
   };
-
-  if(token){
-    options.headers.Authorization = "Bearer " + token;
-  }
-
-  const response = await fetch(API + path, options);
-  const data = await response.json();
-
-  if(!response.ok){
-    throw new Error(data.message || "Terjadi kesalahan.");
-  }
-
-  return data;
 }
 
-document.getElementById("registerForm").addEventListener("submit", async e => {
-  e.preventDefault();
+async function getCurrentAccount(){
 
-  try{
-    const data = await api("/api/auth/register", {
-      method:"POST",
-      body:JSON.stringify({
-        name:document.getElementById("registerName").value,
-        email:document.getElementById("registerEmail").value,
-        password:document.getElementById("registerPassword").value
-      })
-    });
+  const {
+    data: {
+      session
+    },
+    error: sessionError
+  } =
+    await db.auth.getSession();
 
-    token = data.token;
-    localStorage.setItem("tokokasir_token", token);
-    renderUser(data.user);
-
-  }catch(error){
-    showMessage(error.message, "error");
+  if (sessionError) {
+    throw sessionError;
   }
-});
 
-document.getElementById("loginForm").addEventListener("submit", async e => {
-  e.preventDefault();
-
-  try{
-    const data = await api("/api/auth/login", {
-      method:"POST",
-      body:JSON.stringify({
-        email:document.getElementById("loginEmail").value,
-        password:document.getElementById("loginPassword").value
-      })
-    });
-
-    token = data.token;
-    localStorage.setItem("tokokasir_token", token);
-    renderUser(data.user);
-
-  }catch(error){
-    showMessage(error.message, "error");
+  if (!session) {
+    return null;
   }
-});
+
+  const {
+    data: profile,
+    error: profileError
+  } =
+    await db
+      .from("profiles")
+      .select("*")
+      .eq(
+        "id",
+        session.user.id
+      )
+      .maybeSingle();
+
+  if (profileError) {
+    throw profileError;
+  }
+
+  return {
+    session,
+    user:
+      profileToUser(
+        profile,
+        session.user
+      )
+  };
+}
+
+document
+  .getElementById("registerForm")
+  .addEventListener(
+    "submit",
+    async e => {
+
+      e.preventDefault();
+
+      try {
+
+        const name =
+          document
+            .getElementById("registerName")
+            .value
+            .trim();
+
+        const email =
+          document
+            .getElementById("registerEmail")
+            .value
+            .trim();
+
+        const password =
+          document
+            .getElementById("registerPassword")
+            .value;
+
+        const {
+          data,
+          error
+        } =
+          await db.auth.signUp({
+            email,
+            password,
+
+            options: {
+              data: {
+                name
+              }
+            }
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        if (data.session) {
+
+          await loadAccount();
+
+          showMessage(
+            "Pendaftaran berhasil.",
+            "success"
+          );
+
+        } else {
+
+          showMessage(
+            "Pendaftaran berhasil. Silakan cek email untuk konfirmasi akun.",
+            "success"
+          );
+
+        }
+
+      } catch (error) {
+
+        showMessage(
+          error.message ||
+          "Pendaftaran gagal.",
+          "error"
+        );
+
+      }
+    }
+  );
+
+document
+  .getElementById("loginForm")
+  .addEventListener(
+    "submit",
+    async e => {
+
+      e.preventDefault();
+
+      try {
+
+        const email =
+          document
+            .getElementById("loginEmail")
+            .value
+            .trim();
+
+        const password =
+          document
+            .getElementById("loginPassword")
+            .value;
+
+        const {
+          error
+        } =
+          await db.auth
+            .signInWithPassword({
+              email,
+              password
+            });
+
+        if (error) {
+          throw error;
+        }
+
+        await loadAccount();
+
+      } catch (error) {
+
+        showMessage(
+          error.message ||
+          "Login gagal.",
+          "error"
+        );
+
+      }
+    }
+  );
 
 function renderUser(user){
-  document.getElementById("authArea").style.display = "none";
-  document.getElementById("dashboard").classList.add("show");
 
-  document.getElementById("welcome").textContent =
-    "Halo, " + user.name;
+  document
+    .getElementById("authArea")
+    .style.display =
+      "none";
 
-  document.getElementById("userEmail").textContent =
-    user.email;
+  document
+    .getElementById("dashboard")
+    .classList.add("show");
 
-  document.getElementById("planBadge").textContent =
-    user.plan.toUpperCase();
+  document
+    .getElementById("welcome")
+    .textContent =
+      "Halo, " + user.name;
 
-  document.getElementById("currentPlan").textContent =
-    user.plan.toUpperCase();
+  document
+    .getElementById("userEmail")
+    .textContent =
+      user.email;
 
-  document.getElementById("subscriptionStatus").textContent =
-    user.subscriptionStatus;
+  document
+    .getElementById("planBadge")
+    .textContent =
+      user.plan.toUpperCase();
 
-  document.getElementById("expiresAt").textContent =
-    user.subscriptionExpiresAt
-      ? new Date(user.subscriptionExpiresAt).toLocaleDateString("id-ID")
-      : "Tidak terbatas";
+  document
+    .getElementById("currentPlan")
+    .textContent =
+      user.plan.toUpperCase();
+
+  document
+    .getElementById("subscriptionStatus")
+    .textContent =
+      user.subscriptionStatus;
+
+  document
+    .getElementById("expiresAt")
+    .textContent =
+      user.subscriptionExpiresAt
+        ? new Date(
+            user.subscriptionExpiresAt
+          ).toLocaleDateString("id-ID")
+        : "Tidak terbatas";
 }
 
 async function loadAccount(){
-  if(!token) return;
 
-  try{
-    const data = await api("/api/me");
-    renderUser(data.user);
-  }catch{
-    logout();
+  try {
+
+    const account =
+      await getCurrentAccount();
+
+    if (!account) {
+      return;
+    }
+
+    renderUser(
+      account.user
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      error.message ||
+      "Gagal memuat akun.",
+      "error"
+    );
+
   }
 }
 
 async function checkout(plan){
-  try{
-    const data = await api("/api/payments", {
-      method:"POST",
-      body:JSON.stringify({plan})
-    });
 
-    const payment = data.payment;
+  try {
 
-    const url =
-      "../payment/?plan=" +
-      encodeURIComponent(plan) +
-      "&payment_id=" +
-      encodeURIComponent(payment.id);
+    const account =
+      await getCurrentAccount();
 
-    window.location.href = url;
+    if (!account) {
 
-  }catch(error){
+      showMessage(
+        "Silakan login terlebih dahulu.",
+        "error",
+        "dashboardMessage"
+      );
+
+      return;
+    }
+
+    if (
+      plan !== "pro" &&
+      plan !== "business"
+    ) {
+      throw new Error(
+        "Paket tidak valid."
+      );
+    }
+
+    const amount =
+      plan === "pro"
+        ? 99000
+        : 299000;
+
+    const {
+      data: existing,
+      error: existingError
+    } =
+      await db
+        .from("payments")
+        .select("*")
+        .eq(
+          "auth_user_id",
+          account.session.user.id
+        )
+        .eq(
+          "plan",
+          plan
+        )
+        .eq(
+          "status",
+          "pending"
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        )
+        .limit(1);
+
+    if (existingError) {
+      throw existingError;
+    }
+
+    let payment;
+
+    if (
+      existing &&
+      existing.length > 0
+    ) {
+
+      payment =
+        existing[0];
+
+    } else {
+
+      const {
+        data,
+        error
+      } =
+        await db
+          .from("payments")
+          .insert({
+            auth_user_id:
+              account.session.user.id,
+
+            plan,
+
+            amount,
+
+            status:
+              "pending",
+
+            payment_method:
+              "qris"
+          })
+          .select()
+          .single();
+
+      if (error) {
+        throw error;
+      }
+
+      payment = data;
+    }
+
+    window.location.href =
+      "../payment/?payment_id=" +
+      encodeURIComponent(
+        payment.id
+      );
+
+  } catch (error) {
+
+    console.error(error);
+
     showMessage(
-      error.message,
+      error.message ||
+      "Gagal membuat pembayaran.",
       "error",
       "dashboardMessage"
     );
+
   }
 }
 
-
 async function refreshAccount(){
-  try{
-    const data = await api("/api/me");
-    renderUser(data.user);
+
+  try {
+
+    const account =
+      await getCurrentAccount();
+
+    if (!account) {
+      throw new Error(
+        "Silakan login kembali."
+      );
+    }
+
+    renderUser(
+      account.user
+    );
 
     showMessage(
       "Status paket berhasil diperbarui: " +
-      data.user.plan.toUpperCase(),
+      account.user.plan.toUpperCase(),
       "success",
       "dashboardMessage"
     );
-  }catch(error){
+
+  } catch (error) {
+
     showMessage(
       error.message,
       "error",
       "dashboardMessage"
     );
+
   }
 }
 
-function logout(){
-  localStorage.removeItem("tokokasir_token");
-  token = null;
+async function logout(){
+
+  await db.auth.signOut();
+
   location.reload();
 }
 
+db.auth.onAuthStateChange(
+  () => {
+    loadAccount();
+  }
+);
+
 loadAccount();
 </script>
+
+
+
 
 
 </body>

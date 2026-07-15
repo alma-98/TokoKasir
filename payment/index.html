@@ -222,71 +222,85 @@ h1{
 </div>
 </div>
 
-<script src="../config/api.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../config/supabase-config.js"></script>
+<script src="../config/supabase-client.js"></script>
+
 <script>
-const API_BASE = window.TOKOKASIR_API_URL;
-
-const API = window.TOKOKASIR_API_URL;
-
-const token =
-  localStorage.getItem("tokokasir_token");
+const db =
+  window.tokoKasirSupabase;
 
 const params =
-  new URLSearchParams(location.search);
+  new URLSearchParams(
+    location.search
+  );
 
 const paymentId =
   params.get("payment_id");
 
 const content =
-  document.getElementById("content");
-
-if (!token) {
-  location.replace("../account/");
-}
+  document.getElementById(
+    "content"
+  );
 
 if (!paymentId) {
-  showError("ID pembayaran tidak ditemukan.");
+
+  showError(
+    "ID pembayaran tidak ditemukan."
+  );
+
 } else {
+
   loadPayment();
+
 }
 
-async function api(path, options = {}) {
-
-  options.headers = {
-    ...(options.headers || {}),
-    Authorization:
-      "Bearer " + token
-  };
-
-  const response =
-    await fetch(API + path, options);
-
-  const data =
-    await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.message ||
-      "Terjadi kesalahan."
-    );
-  }
-
-  return data;
-}
-
-async function loadPayment() {
+async function loadPayment(){
 
   try {
 
-    const data =
-      await api("/api/payments/my");
+    const {
+      data: {
+        session
+      },
+      error: sessionError
+    } =
+      await db.auth.getSession();
 
-    const payment =
-      data.payments.find(
-        item =>
-          String(item.id) ===
-          String(paymentId)
+    if (sessionError) {
+      throw sessionError;
+    }
+
+    if (!session) {
+
+      location.replace(
+        "../account/"
       );
+
+      return;
+    }
+
+    const {
+      data: payment,
+      error
+    } =
+      await db
+        .from("payments")
+        .select("*")
+        .eq(
+          "id",
+          paymentId
+        )
+        .eq(
+          "auth_user_id",
+          session.user.id
+        )
+        .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
 
     if (!payment) {
       throw new Error(
@@ -294,11 +308,18 @@ async function loadPayment() {
       );
     }
 
-    renderPayment(payment);
+    renderPayment(
+      payment
+    );
 
   } catch (error) {
 
-    showError(error.message);
+    console.error(error);
+
+    showError(
+      error.message ||
+      "Gagal memuat pembayaran."
+    );
 
   }
 }
@@ -491,6 +512,7 @@ function showError(message) {
     </a>
   `;
 }
+
 </script>
 
 
