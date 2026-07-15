@@ -663,6 +663,22 @@ tr:hover td {
 
 }
 </style>
+
+<style id="TOKOKASIR_DELETE_PAYMENT_STYLE">
+
+.btn-delete-payment {
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.btn-delete-payment:hover {
+  background: #ffe4e6;
+  border-color: #fda4af;
+}
+
+</style>
+
 </head>
 
 <body>
@@ -1801,6 +1817,14 @@ function renderPayments(
 
                 <div class="table-actions">
                   ${actions}
+          <button
+            type="button"
+            class="btn btn-delete-payment"
+            onclick="deletePayment(${payment.id})"
+          >
+            Hapus
+          </button>
+
                 </div>
 
               </td>
@@ -2176,6 +2200,116 @@ if (!db) {
   checkAdmin();
 
 }
+
+// ==========================================================
+// TOKOKASIR_DELETE_PAYMENT_FUNCTION
+// Menghapus record payment.
+// Tidak mengubah paket customer yang sudah aktif.
+// ==========================================================
+
+async function deletePayment(paymentId) {
+
+  const numericPaymentId =
+    Number(paymentId);
+
+  if (
+    !Number.isInteger(
+      numericPaymentId
+    )
+  ) {
+
+    showMessage(
+      "ID pembayaran tidak valid.",
+      "error"
+    );
+
+    return;
+  }
+
+  const confirmed =
+    window.confirm(
+      "Yakin ingin menghapus pembayaran #" +
+      numericPaymentId +
+      "?\n\n" +
+      "Data pembayaran yang sudah dihapus " +
+      "tidak dapat dikembalikan.\n\n" +
+      "Catatan: menghapus transaksi tidak otomatis " +
+      "menonaktifkan paket customer."
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+
+    showMessage(
+      "Menghapus pembayaran #" +
+      numericPaymentId +
+      "..."
+    );
+
+    const {
+      error
+    } =
+      await db
+        .from("payments")
+        .delete()
+        .eq(
+          "id",
+          numericPaymentId
+        );
+
+    if (error) {
+
+      console.error(
+        "DELETE PAYMENT ERROR:",
+        error
+      );
+
+      throw error;
+    }
+
+    showMessage(
+      "Pembayaran #" +
+      numericPaymentId +
+      " berhasil dihapus."
+    );
+
+    if (
+      typeof loadPayments ===
+      "function"
+    ) {
+
+      await loadPayments();
+
+    } else {
+
+      window.location.reload();
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "DELETE PAYMENT ERROR:",
+      error
+    );
+
+    showMessage(
+      error.message ||
+      "Gagal menghapus pembayaran.",
+      "error"
+    );
+
+  }
+
+}
+
+window.deletePayment =
+  deletePayment;
+
+
 </script>
 
 </body>
