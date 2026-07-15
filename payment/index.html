@@ -259,17 +259,19 @@ if (!paymentId) {
 
 
 
+
+;
+
+
 window.loadPayment = async function loadPayment() {
 
-  const buttons =
-    document.querySelectorAll(
-      'button[onclick="loadPayment()"]'
-    );
+  const button =
+    document.getElementById("checkStatusButton");
 
-  buttons.forEach(button => {
+  if (button) {
     button.disabled = true;
     button.textContent = "Memeriksa status...";
-  });
+  }
 
   try {
 
@@ -299,7 +301,10 @@ window.loadPayment = async function loadPayment() {
     } = await db
       .from("payments")
       .select("*")
-      .eq("id", paymentId)
+      .eq(
+        "id",
+        paymentId
+      )
       .eq(
         "auth_user_id",
         session.user.id
@@ -332,15 +337,16 @@ window.loadPayment = async function loadPayment() {
 
   } finally {
 
-    document
-      .querySelectorAll(
-        'button[onclick="loadPayment()"]'
-      )
-      .forEach(button => {
-        button.disabled = false;
-        button.textContent =
-          "Cek Status Pembayaran";
-      });
+    const currentButton =
+      document.getElementById(
+        "checkStatusButton"
+      );
+
+    if (currentButton) {
+      currentButton.disabled = false;
+      currentButton.textContent =
+        "Cek Status Pembayaran";
+    }
 
   }
 };
@@ -402,8 +408,10 @@ function renderPayment(payment) {
 
     actionHtml = `
       <button
+        id="checkStatusButton"
         class="btn primary"
-        onclick="loadPayment()"
+        type="button"
+        onclick="window.loadPayment()"
       >
         Cek Status Pembayaran
       </button>
