@@ -295,6 +295,62 @@ h1{
 
 </style>
 
+
+<style id="TOKOKASIR_MAIN_WEBSITE_BUTTON">
+
+.main-website-button {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 14px 20px;
+
+  background: #0f172a;
+  color: #ffffff !important;
+
+  border: 1px solid #0f172a;
+  border-radius: 12px;
+
+  font-size: 15px;
+  font-weight: 800;
+
+  text-decoration: none !important;
+
+  cursor: pointer;
+
+  transition:
+    transform .15s ease,
+    opacity .15s ease,
+    box-shadow .15s ease;
+}
+
+.main-website-button:hover {
+  opacity: .92;
+
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 10px 25px
+    rgba(15, 23, 42, .15);
+}
+
+.main-website-button:active {
+  transform:
+    translateY(0);
+}
+
+.main-website-button .arrow {
+  font-size: 18px;
+}
+
+</style>
+
 </head>
 
 <body>
@@ -786,10 +842,11 @@ function showError(message) {
       </a>
 
       <a
-        class="btn secondary"
+        class="main-website-button"
         href="/TokoKasir/"
       >
-        ← Kembali ke Website
+        <span class="arrow">←</span>
+        <span>Kembali ke Website TokoKasir</span>
       </a>
 
     </div>
