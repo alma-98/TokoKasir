@@ -396,91 +396,112 @@ if (!paymentId) {
 
 window.loadPayment = async function loadPayment() {
 
-  const button =
-    document.getElementById("checkStatusButton");
-
-  if (button) {
-    button.disabled = true;
-    button.textContent = "Memeriksa status...";
-  }
-
   try {
 
-    const {
-      data: { session },
-      error: sessionError
-    } = await db.auth.getSession();
+    content.innerHTML = `
+      <div style="
+        padding:30px;
+        text-align:center;
+      ">
+        Memuat informasi pembayaran...
+      </div>
+    `;
 
-    if (sessionError) {
-      throw sessionError;
+    // Ambil user Supabase yang sedang login
+    const {
+      data: {
+        user
+      },
+      error: userError
+    } =
+      await db.auth.getUser();
+
+    if (userError) {
+      throw userError;
     }
 
-    if (!session) {
-      location.replace("../account/");
+    if (!user) {
+
+      window.location.href =
+        "/TokoKasir/account/";
+
       return;
     }
 
     if (!paymentId) {
+
       throw new Error(
         "ID pembayaran tidak ditemukan."
       );
+
     }
 
+    console.log(
+      "LOAD PAYMENT:",
+      {
+        payment_id: paymentId,
+        auth_user_id: user.id
+      }
+    );
+
+    // Payment ID adalah bigint.
+    // User Auth adalah UUID.
+    // Jangan bandingkan UUID dengan kolom id bigint.
     const {
       data: payment,
-      error
-    } = await db
-      .from("payments")
-      .select("*")
-      .eq(
-        "id",
-        paymentId
-      )
-      .eq(
-        "auth_user_id",
-        session.user.id
-      )
-      .maybeSingle();
+      error: paymentError
+    } =
+      await db
+        .from("payments")
+        .select("*")
+        .eq(
+          "id",
+          Number(paymentId)
+        )
+        .eq(
+          "auth_user_id",
+          user.id
+        )
+        .maybeSingle();
 
-    if (error) {
-      throw error;
+    if (paymentError) {
+
+      console.error(
+        "PAYMENT LOAD ERROR:",
+        paymentError
+      );
+
+      throw paymentError;
     }
 
     if (!payment) {
+
       throw new Error(
-        "Tagihan pembayaran tidak ditemukan."
+        "Tagihan tidak ditemukan atau bukan milik akun ini."
       );
+
     }
 
-    renderPayment(payment);
+    renderPayment(
+      payment
+    );
 
   } catch (error) {
 
     console.error(
-      "TokoKasir payment status error:",
+      "LOAD PAYMENT ERROR:",
       error
     );
 
     showError(
       error.message ||
-      "Gagal memeriksa status pembayaran."
+      "Gagal memuat informasi pembayaran."
     );
 
-  } finally {
-
-    const currentButton =
-      document.getElementById(
-        "checkStatusButton"
-      );
-
-    if (currentButton) {
-      currentButton.disabled = false;
-      currentButton.textContent =
-        "Cek Status Pembayaran";
-    }
-
   }
-};
+
+}
+
 
 function renderPayment(payment) {
 
