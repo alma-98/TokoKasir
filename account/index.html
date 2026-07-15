@@ -551,23 +551,9 @@ async function loadAccount(){
   }
 }
 
-async function checkout(plan){
+async function checkout(plan) {
 
   try {
-
-    const account =
-      await getCurrentAccount();
-
-    if (!account) {
-
-      showMessage(
-        "Silakan login terlebih dahulu.",
-        "error",
-        "dashboardMessage"
-      );
-
-      return;
-    }
 
     if (
       plan !== "pro" &&
@@ -578,93 +564,96 @@ async function checkout(plan){
       );
     }
 
-    const amount =
-      plan === "pro"
-        ? 99000
-        : 299000;
+    showMessage(
+      "Membuat tagihan " +
+      plan.toUpperCase() +
+      "...",
+      "success",
+      "dashboardMessage"
+    );
 
+    // Ambil user Supabase yang sedang login
     const {
-      data: existing,
-      error: existingError
+      data: {
+        user
+      },
+      error: userError
+    } =
+      await db.auth.getUser();
+
+    if (userError) {
+      throw userError;
+    }
+
+    if (!user) {
+
+      throw new Error(
+        "Silakan login terlebih dahulu."
+      );
+
+    }
+
+    // Harga paket
+    const amount =
+      plan === "business"
+        ? 299000
+        : 99000;
+
+    // Buat payment langsung di Supabase
+    const {
+      data: payment,
+      error: paymentError
     } =
       await db
         .from("payments")
-        .select("*")
-        .eq(
-          "auth_user_id",
-          account.session.user.id
-        )
-        .eq(
-          "plan",
-          plan
-        )
-        .eq(
-          "status",
-          "pending"
-        )
-        .order(
-          "created_at",
-          {
-            ascending: false
-          }
-        )
-        .limit(1);
+        .insert({
+          user_id: user.id,
+          plan: plan,
+          amount: amount,
+          status: "pending",
+          payment_method: "qris"
+        })
+        .select()
+        .single();
 
-    if (existingError) {
-      throw existingError;
+    if (paymentError) {
+
+      console.error(
+        "CREATE PAYMENT ERROR:",
+        paymentError
+      );
+
+      throw new Error(
+        paymentError.message ||
+        "Gagal membuat tagihan."
+      );
+
     }
-
-    let payment;
 
     if (
-      existing &&
-      existing.length > 0
+      !payment ||
+      !payment.id
     ) {
 
-      payment =
-        existing[0];
+      throw new Error(
+        "ID pembayaran tidak berhasil dibuat."
+      );
 
-    } else {
-
-      const {
-        data,
-        error
-      } =
-        await db
-          .from("payments")
-          .insert({
-            auth_user_id:
-              account.session.user.id,
-
-            plan,
-
-            amount,
-
-            status:
-              "pending",
-
-            payment_method:
-              "qris"
-          })
-          .select()
-          .single();
-
-      if (error) {
-        throw error;
-      }
-
-      payment = data;
     }
 
+    // Langsung ke halaman QRIS
     window.location.href =
-      "../payment/?payment_id=" +
+      "/TokoKasir/payment/?payment_id=" +
       encodeURIComponent(
         payment.id
       );
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "CHECKOUT ERROR:",
+      error
+    );
 
     showMessage(
       error.message ||
@@ -674,6 +663,7 @@ async function checkout(plan){
     );
 
   }
+
 }
 
 async function refreshAccount(){
