@@ -679,6 +679,20 @@ function renderPayment(payment) {
 
     <div class="actions">
       ${actionHtml}
+      <button
+        type="button"
+        class="btn secondary"
+        onclick="
+          if (window.history.length > 1) {
+            window.history.back();
+          } else {
+            window.location.href='/TokoKasir/account/';
+          }
+        "
+      >
+        ← Kembali
+      </button>
+
     </div>
 
     <div class="note">
